@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "operations",
+  "title": "Operations",
+  "status": "current",
+  "audience": [
+    "Document reviewers",
+    "Frontend developers",
+    "Contributors"
+  ],
+  "useWhen": "Use the corresponding current guide for this task.",
+  "sourceOfTruth": "current/operations.md",
+  "counterparts": {
+    "markdown": "current/operations.md",
+    "html": "current/operations.html",
+    "json": "current/operations.json"
+  },
+  "summary": "Current operations guidance for PDFoid.",
+  "sections": [
+    {
+      "id": "purpose",
+      "label": "Purpose"
+    },
+    {
+      "id": "on-this-page",
+      "label": "On this page"
+    },
+    {
+      "id": "guidance",
+      "label": "Guidance"
+    },
+    {
+      "id": "verification",
+      "label": "Verification"
+    },
+    {
+      "id": "related-guides",
+      "label": "Related guides"
+    },
+    {
+      "id": "runtime-signals",
+      "label": "Runtime signals"
+    },
+    {
+      "id": "release-routine",
+      "label": "Release routine"
+    }
+  ],
+  "relatedGuides": [
+    "start-here",
+    "architecture",
+    "quality",
+    "contributing"
+  ],
+  "keywords": [
+    "pdfoid",
+    "operations",
+    "documentation",
+    "current"
+  ],
+  "lastReviewed": "2026-07-13",
+  "sourceChecksum": "f85f40472be34a813ddc703aa828041b396fc957d8fc0900fc39e9c59cca0751",
+  "generatedAt": "2026-07-13T11:47:55.598084+00:00",
+  "release": "archive-2026-07-13",
+  "validation": {
+    "state": "generated"
+  }
+}

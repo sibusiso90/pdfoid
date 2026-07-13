@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Open Source Distribution",
+  "group": "Project",
+  "path": ".docs/open-source-distribution.md",
+  "lead": "PDFoid is an open-source PDF tool created and maintained by Lehro Solutions.",
+  "content_markdown": "# Open-source + Hosted Distribution Model\n\n## Summary\nPDFoid is an open-source PDF tool created and maintained by **Lehro Solutions**.\n\nWe operate two tracks:\n- **Public (GitHub) track**: the open-source codebase intended for the community.\n- **In-house track**: a private/internal variant used to test beta features before they are hardened and upstreamed.\n\nThis approach helps us ship safely, iterate quickly, and keep the public repo stable.\n\n## What stays open-source\n- The core editor, viewer, and annotation tooling\n- Bug fixes, performance improvements, and security patches\n- Most UX improvements and general-purpose capabilities\n\n## What may exist only in the in-house track (temporarily)\n- Experimental features that are not yet stable\n- Risky refactors under evaluation\n- Feature-flagged prototypes that require additional validation\n\nRule of thumb: if it is stable and broadly useful, it should be upstreamed.\n\n## Upstreaming policy\n- Prefer small, reviewable pull requests.\n- Avoid introducing hidden dependencies on private services.\n- Write an ADR when a change affects architecture, persistence, or file formats.\n\n## Compatibility expectations\n- Public releases should not silently break saved annotations or exported PDFs.\n- If a breaking change is unavoidable, document a migration plan.\n\n## License\nSee [LICENSE](../LICENSE). The project uses a permissive license so the public codebase can be used broadly, while Lehro Solutions can still run and host a maintained version.\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Pdf Pipeline",
+  "group": "Project",
+  "path": ".docs/pdf-pipeline.md",
+  "lead": "Rule of thumb:",
+  "content_markdown": "# PDF Pipeline Notes\n\n## Libraries\n- Rendering/extraction: `pdfjs-dist` (PDF.js)\n- Mutation/export: `pdf-lib`\n\n## Coordinate systems (practical)\n- PDF.js viewport coordinates: derived from page transform at a chosen scale\n- PDF points: PDF page coordinate space used by pdf-lib\n- Canvas pixels: internal buffer of HTML canvas\n- CSS pixels: displayed size of the canvas element\n\nRule of thumb:\n- For interaction/drawing: always map CSS\u2192canvas pixels in `AnnotationCanvas`.\n- For find/replace overlays: rects are approximations from PDF.js extraction.\n\n## Find/Replace: what is and isn\u2019t possible\n- Search/highlight: generally reliable for selectable text.\n- True \u201cedit existing text\u201d: not reliably supported client-side for arbitrary PDFs.\n\nCurrent approach:\n- Locate match via PDF.js text items\n- Compute an approximate bounding rect\n- Draw a white rectangle (cover old glyphs)\n- Draw replacement text (pdf-lib)\n\nWhy this may not match perfectly:\n- Original font may be embedded/custom; replacement uses a standard font.\n- Kerning/word spacing differs.\n- Some PDFs position glyphs individually (no semantic word boundaries).\n\n## Safety guidelines for overlays\n- Never erase large areas (guard against outliers).\n- Skip rotated/skewed text unless explicitly supported.\n- Prefer per-match replacement with user confirmation in complex docs.\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

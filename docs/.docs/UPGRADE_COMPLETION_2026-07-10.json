@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Upgrade Completion 2026 07 10",
+  "group": "Project",
+  "path": ".docs/UPGRADE_COMPLETION_2026-07-10.md",
+  "lead": "Run npm test and npm run build after restoring locked dependencies.",
+  "content_markdown": "# 2026 Upgrade Completion\n\n## Outcome\n\n- Cold-neutral cobalt visual system with dark-mode tokens.\n- Reduced-motion support.\n- Annotation export/storage scoped to active `pdfId`.\n\n## Verification gates\n\nRun `npm test` and `npm run build` after restoring locked dependencies.\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

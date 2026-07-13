@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "start-here",
+  "title": "Start Here",
+  "status": "current",
+  "audience": [
+    "Document reviewers",
+    "Frontend developers",
+    "Contributors"
+  ],
+  "useWhen": "Use the corresponding current guide for this task.",
+  "sourceOfTruth": "current/start-here.md",
+  "counterparts": {
+    "markdown": "current/start-here.md",
+    "html": "current/start-here.html",
+    "json": "current/start-here.json"
+  },
+  "summary": "A browser-based PDF editing workspace focused on annotations, review actions, and export fidelity.",
+  "sections": [
+    {
+      "id": "purpose",
+      "label": "Purpose"
+    },
+    {
+      "id": "on-this-page",
+      "label": "On this page"
+    },
+    {
+      "id": "guidance",
+      "label": "Guidance"
+    },
+    {
+      "id": "verification",
+      "label": "Verification"
+    },
+    {
+      "id": "related-guides",
+      "label": "Related guides"
+    },
+    {
+      "id": "product-route",
+      "label": "Product route"
+    },
+    {
+      "id": "latest-public-changes",
+      "label": "Latest public changes"
+    },
+    {
+      "id": "choose-a-guide",
+      "label": "Choose a guide"
+    }
+  ],
+  "relatedGuides": [
+    "architecture",
+    "quality",
+    "contributing"
+  ],
+  "keywords": [
+    "pdfoid",
+    "start-here",
+    "documentation",
+    "current"
+  ],
+  "lastReviewed": "2026-07-13",
+  "sourceChecksum": "a1d52e60e137e7c1043ef95ef55c73bb46dd277da530040810002358f4293628",
+  "generatedAt": "2026-07-13T11:47:55.596785+00:00",
+  "release": "archive-2026-07-13",
+  "validation": {
+    "state": "generated"
+  }
+}

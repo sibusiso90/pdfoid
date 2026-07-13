@@ -1,18 +1,18 @@
 @import 'tailwindcss';
 
 :root {
-  --pdfoid-bg: #f4f0e7;
-  --pdfoid-surface: #fffaf2;
-  --pdfoid-surface-2: #efe7d8;
-  --pdfoid-border: rgba(47, 33, 22, 0.14);
-  --pdfoid-text: #1f2937;
-  --pdfoid-muted: #6b7280;
-  --pdfoid-accent: #8b5e34;
-  --pdfoid-accent-hover: #7a512c;
-  --pdfoid-accent-active: #6a4526;
-  --pdfoid-accent2: #2f6f5e;
-  --pdfoid-accent-soft: rgba(139, 94, 52, 0.14);
-  --pdfoid-ring: rgba(47, 111, 94, 0.45);
+  --pdfoid-bg: #eef1f4;
+  --pdfoid-surface: #ffffff;
+  --pdfoid-surface-2: #e5e9ee;
+  --pdfoid-border: rgba(15, 23, 42, 0.14);
+  --pdfoid-text: #111827;
+  --pdfoid-muted: #667085;
+  --pdfoid-accent: #2457d6;
+  --pdfoid-accent-hover: #1d49b8;
+  --pdfoid-accent-active: #173b94;
+  --pdfoid-accent2: #2457d6;
+  --pdfoid-accent-soft: rgba(36, 87, 214, 0.12);
+  --pdfoid-ring: rgba(36, 87, 214, 0.46);
 }
 
 html,
@@ -393,3 +393,5 @@ pre {
     transition-duration: 0.01ms !important;
   }
 }
+@media (prefers-color-scheme: dark){:root{--pdfoid-bg:#111418;--pdfoid-surface:#181d23;--pdfoid-surface-2:#222933;--pdfoid-border:rgba(255,255,255,.14);--pdfoid-text:#f5f7fa;--pdfoid-muted:#a4afbd;--pdfoid-accent:#6f98ff;--pdfoid-accent-hover:#89aaff;--pdfoid-accent-active:#a2bbff;--pdfoid-accent2:#6f98ff;--pdfoid-accent-soft:rgba(111,152,255,.14);--pdfoid-ring:rgba(111,152,255,.55)}.drawer-panel{background:var(--pdfoid-surface)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

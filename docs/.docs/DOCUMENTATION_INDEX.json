@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Documentation Index",
+  "group": "Project",
+  "path": ".docs/DOCUMENTATION_INDEX.md",
+  "lead": "\ufeff# Documentation Index",
+  "content_markdown": "\ufeff# Documentation Index\n\n## Start here\n- [Project README](../README.md)\n- [Docs Overview](README.md)\n\n## Implementation & testing\n- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)\n- [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md)\n- [TESTING_GUIDE.md](TESTING_GUIDE.md)\n- [ARCHITECTURE_IMPROVEMENTS.md](ARCHITECTURE_IMPROVEMENTS.md)\n- [COMPLETION_REPORT.md](COMPLETION_REPORT.md)\n\n## Maintainer docs (living)\n- [Skills Overview](skills/README.md)\n\n## Rules\n- [global_rules.md](global_rules.md)\n- [improved_dev_rules.md](improved_dev_rules.md)\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

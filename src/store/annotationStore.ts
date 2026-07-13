@@ -47,6 +47,8 @@ interface AnnotationStore extends AnnotationState {
   redo: () => void;
   undoStackLength: number;
   redoStackLength: number;
+  currentPdfId: string;
+  setCurrentPdfId: (pdfId: string) => void;
 
   // Persistence
   saveToIndexedDB: () => Promise<void>;
@@ -85,6 +87,8 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
   selectedAnnotationId: undefined,
   undoStackLength: 0,
   redoStackLength: 0,
+  currentPdfId: 'current-pdf',
+  setCurrentPdfId: (pdfId: string) => set({ currentPdfId: pdfId || 'current-pdf' }),
 
   // CRUD
   addAnnotation: (annotation: Annotation) => {
@@ -254,7 +258,7 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
       const store = tx.objectStore(STORE_ANNOTATIONS);
 
       const payload = {
-        id: 'annotations:default',
+        id: `annotations:${get().currentPdfId || 'default'}`,
         items: state.annotations,
         signatureDataUrl: (state as any).signatureDataUrl,
         signatureMime: (state as any).signatureMime,
@@ -271,7 +275,8 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
     }
   },
 
-  loadFromIndexedDB: async (_pdfId: string) => {
+  loadFromIndexedDB: async (pdfId: string) => {
+    if (pdfId) set({ currentPdfId: pdfId });
     try {
       const db = await new Promise<IDBDatabase>((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1);
@@ -294,8 +299,9 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
       const tx = db.transaction(STORE_ANNOTATIONS, 'readonly');
       const store = tx.objectStore(STORE_ANNOTATIONS);
 
+      const key = `annotations:${get().currentPdfId || pdfId || 'default'}`;
       const record = await new Promise<any>((resolve, reject) => {
-        const request = store.get('annotations:default');
+        const request = store.get(key);
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
@@ -315,7 +321,7 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
     const state = get();
     const exported = {
       version: '1.0',
-      pdfId: 'current-pdf', // TODO: pass pdfId from context
+      pdfId: get().currentPdfId || 'current-pdf',
       exportDate: new Date().toISOString(),
       annotations: state.annotations,
     };

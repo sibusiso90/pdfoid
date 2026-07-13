@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<title>PDFoid · Deepwiki</title>
+<style>:root{--canvas:#eef1f4;--canvas-2:#f7f9fb;--surface:#ffffff;--surface-2:#e5e9ee;--surface-3:#d7dde5;--border:rgba(15,23,42,.12);--border-strong:rgba(15,23,42,.2);--ink:#111827;--ink-2:#374151;--muted:#667085;--gold:#2457d6;--gold-2:#1d49b8;--gold-soft:rgba(36,87,214,.10);--azure:#2457d6;--live:#0f766e;--coral:#b91c1c;--warning:#b45309;--spine:linear-gradient(90deg,#2457d6,#38bdf8,#6366f1);--display:Georgia, 'Times New Roman', serif;--font:Arial, Helvetica, sans-serif;--mono:Consolas, monospace;--radius-sm:6px;--radius:10px;--radius-lg:14px;--shadow:0 18px 40px rgba(15,23,42,.08);--shadow-sm:0 2px 10px rgba(0,0,0,.12);--link:#2457d6;--sidebar-w:262px;--toc-w:212px;}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.68 var(--font);color:var(--ink-2);background:radial-gradient(1100px 620px at 8% -6%,rgba(36,87,214,.08),transparent 60%),radial-gradient(950px 520px at 104% 1%,rgba(99,102,241,.06),transparent 55%),var(--canvas);}a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}::selection{background:var(--gold-soft);color:var(--ink)}.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--spine);z-index:60;transition:width .1s linear}.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:13px 22px;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;text-decoration:none}.brand:hover{text-decoration:none}.mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);background:var(--gold-soft);border-radius:var(--radius-sm);font:800 11px/1 var(--mono);letter-spacing:.06em}.crumb{color:var(--muted);font-size:.86rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.crumb b{color:var(--ink-2);font-weight:700}.menu-btn{display:none;margin-left:auto;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:6px 11px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.shell{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr) var(--toc-w);gap:36px;max-width:1340px;margin:0 auto;padding:26px 26px 90px;align-items:start}.side{position:sticky;top:76px;max-height:calc(100vh - 98px);overflow-y:auto;padding-right:6px}.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px}.nav-group{margin-bottom:18px}.nav-h{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:7px;display:flex;align-items:center;gap:7px;font-family:var(--mono)}.side a{display:block;padding:6px 11px;border-radius:var(--radius-sm);color:var(--ink-2);font-size:.87rem;font-weight:500;line-height:1.35;border-left:2px solid transparent}.side a:hover{background:var(--surface-2);text-decoration:none;color:var(--ink)}.side a.on{background:var(--gold-soft);border-left-color:var(--gold);color:var(--gold-2)}main{min-width:0}.hero{margin-bottom:18px}.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border-strong);padding:5px 12px;border-radius:999px;font-family:var(--mono)}.hero h1{font-family:var(--display);font-size:2.6rem;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0;font-weight:400;color:var(--ink)}.hero .lead{color:var(--ink-2);font-size:1.05rem;max-width:70ch;margin:12px 0 0}.spine{height:3px;border-radius:999px;background:var(--spine);margin:20px 0 0}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px 30px}.card h2{font-family:var(--display);font-size:1.45rem;color:var(--ink);font-weight:400;margin:1.4em 0 .5em;padding-bottom:.35em;border-bottom:1px solid var(--border)}.card h2:first-child{margin-top:0}.card h3{font-size:1.02rem;color:var(--ink);margin:1.15em 0 .4em}.card p,.card li{color:var(--ink-2)}.card ul,.card ol{padding-left:1.2rem}.card li{margin:.35em 0}code,pre{font-family:var(--mono)}code{background:var(--gold-soft);padding:.12em .38em;border-radius:6px;font-size:.9em}pre{overflow:auto;background:var(--canvas-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;line-height:1.5}pre code{background:transparent;padding:0}.table-wrap{overflow:auto;margin:1rem 0}table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{border:1px solid var(--border);padding:8px 10px;text-align:left}th{background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}.toc{position:sticky;top:76px}.toc h4{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-family:var(--mono)}.toc a{display:block;padding:5px 0 5px 10px;border-left:2px solid var(--border);color:var(--muted);font-size:.82rem}.toc a:hover{color:var(--ink);text-decoration:none}.toc a.h3{padding-left:18px;font-size:.78rem}.toc a.on{border-left-color:var(--gold);color:var(--gold-2)}.related{margin-top:28px}.related h3{font-family:var(--display);font-size:1.35rem;color:var(--ink);font-weight:400;margin:0 0 12px}.rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.rel-card{display:block;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--ink-2)}.rel-card:hover{border-color:var(--border-strong);text-decoration:none;color:var(--ink);background:var(--surface)}.rel-card b{display:block;color:var(--ink);margin-bottom:4px}.rel-card span{font-size:.84rem;color:var(--muted)}.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}.pager a{display:block;min-width:180px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink-2)}.pager a:hover{border-color:var(--gold);text-decoration:none;color:var(--ink)}.pager .k{display:block;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.footer-note{margin-top:26px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:.84rem}.wrap{max-width:1140px;margin:0 auto;padding:14px 26px 90px}.hero-lg{padding:40px 0 6px}.hero-lg h1{font-family:var(--display);font-size:3.2rem;line-height:1.04;letter-spacing:-.01em;margin:10px 0 0;font-weight:400;color:var(--ink)}.hero-lg .tag{color:var(--ink-2);font-size:1.1rem;max-width:680px;margin-top:14px}.pill{display:inline-block;margin:18px 8px 0 0;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border-strong);color:var(--ink-2);font-size:.72rem;font-weight:600;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}.search{margin:24px 0 4px;width:100%;max-width:520px;padding:13px 16px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface);box-shadow:var(--shadow-sm);font:inherit;font-size:.95rem;color:var(--ink)}.search::placeholder{color:var(--muted)}.search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}.psec{margin-top:32px}.psec h2{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:1.5rem;color:var(--ink);font-weight:400;border-top:1px solid var(--border);padding-top:22px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}.gcard{display:block;padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink-2);min-height:120px}.gcard:hover{border-color:var(--border-strong);text-decoration:none;transform:translateY(-1px);color:var(--ink)}.gcard b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:6px}.gcard span{font-size:.9rem;color:var(--muted)}.gcard .grp{display:inline-block;margin-bottom:8px;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}@media (max-width:1100px){.shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr)}.toc{display:none}}@media (max-width:860px){.shell{grid-template-columns:1fr;padding:16px}.side{position:static;max-height:none;display:none}.side.open{display:block}.menu-btn{display:inline-block}.hero h1,.hero-lg h1{font-size:2.1rem}}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}</style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="topbar">
+  <a class="brand" href="index.html"><span class="mark">PDF</span>PDFoid docs</a>
+  <span class="crumb"><a href="index.html">Docs</a> / <b>Deepwiki</b></span>
+  <button class="menu-btn" type="button">Menu</button>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Documentation"><div class="nav-group"><div class="nav-h">Guides</div><a href="architecture.html">Architecture</a><a href="catalog.html">Catalog</a><a href="design-system.html">Design System</a><a href="how-to-use.html">How To Use</a><a href="index.html">Index</a><a href="license.html">License</a><a href="roadmap.html">Roadmap</a><a href="security.html">Security</a><a href="skills.html">Skills</a><a href="../how-to-use.html">How To Use</a></div><div class="nav-group"><div class="nav-h">ADRs</div><a href="adr-0001-docs-system.html">Adr 0001 Docs System</a><a href="adr-0002-apache-2-0.html">Adr 0002 Apache 2 0</a><a href="adr-0003-package-manager-bun.html">Adr 0003 Package Manager Bun</a></div><div class="nav-group"><div class="nav-h">Project</div><a href="ARCHITECTURE_IMPROVEMENTS.html">Architecture Improvements</a><a href="AUDIT_IMPROVEMENTS_2026-07-10.html">Audit Improvements 2026 07 10</a><a href="COMPLETION_REPORT.html">Completion Report</a><a class="on" href="DEEPWIKI.html">Deepwiki</a><a href="DOCUMENTATION_INDEX.html">Documentation Index</a><a href="IMPLEMENTATION_SUMMARY.html">Implementation Summary</a><a href="IMPROVEMENTS_SUMMARY.html">Improvements Summary</a><a href="PHASE_1_IMPLEMENTATION.html">Phase 1 Implementation</a><a href="SECURITY_ISSUES_2026-07-10.html">Security Issues 2026 07 10</a><a href="TESTING_GUIDE.html">Testing Guide</a><a href="UPGRADE_COMPLETION_2026-07-10.html">Upgrade Completion 2026 07 10</a><a href="codebase-map.html">Codebase Map</a><a href="global_rules.html">Global Rules</a><a href="glossary.html">Glossary</a><a href="improved_dev_rules.html">Improved Dev Rules</a><a href="known-limitations.html">Known Limitations</a><a href="open-source-distribution.html">Open Source Distribution</a><a href="pdf-pipeline.html">Pdf Pipeline</a><a href="state-management.html">State Management</a></div></nav>
+  <main id="top">
+    <header class="hero">
+      <span class="eyebrow">Cold-neutral cobalt</span>
+      <h1>Deepwiki</h1>
+      <p class="lead">Primary Objective: Build a high-quality, AI-assisted PDF editor with built-in local AI capabilities.</p>
+      <div class="spine"></div>
+    </header>
+    <article class="card">
+<h2 id="1-project-vision-goals">1. Project Vision &amp; Goals</h2>
+<p><strong>Primary Objective</strong>: Build a high-quality, AI-assisted PDF editor with built-in local AI capabilities.</p>
+<p><strong>Core Principles</strong>:</p>
+<ul>
+<li>Be critical when thinking and solving problems</li>
+<li>Don't make assumptions - always analyze code</li>
+<li>Use best practices without overcomplication</li>
+<li>Design for both mobile and web (responsive &amp; accessible)</li>
+<li>Prioritize user experience and modern design</li>
+<li>Code for production quality before deployment</li>
+</ul>
+<h2 id="2-technology-stack-rationale">2. Technology Stack &amp; Rationale</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Layer</th><th>Technology</th><th>Justification</th></tr></thead><tbody>
+<tr><td><strong>Frontend</strong></td><td>React 18.2.0 + TypeScript 5.6.2</td><td>Component-based UI with type safety; mature ecosystem</td></tr>
+<tr><td><strong>Build Tool</strong></td><td>Vite 5.0.0</td><td>Fast development experience, native ESM support, optimized prod builds</td></tr>
+<tr><td><strong>Styling</strong></td><td>Tailwind CSS 4.1.16</td><td>Utility-first CSS, dark/light modes, responsive design out of box</td></tr>
+<tr><td><strong>PDF Rendering</strong></td><td>pdfjs-dist 3.11.174</td><td>Battle-tested PDF.js from Mozilla, renders complex PDFs accurately</td></tr>
+<tr><td><strong>AI (Built-in)</strong></td><td>TextRank + RAKE</td><td>Local, no external API cost; summarization &amp; keyword extraction without models</td></tr>
+<tr><td><strong>PDF Manipulation</strong></td><td>pdf-lib (planned)</td><td>Add/remove pages, sign PDFs, insert images without external services</td></tr>
+<tr><td><strong>OCR (Future)</strong></td><td>Tesseract.js</td><td>Client-side OCR for scanned PDFs, searchable text extraction</td></tr>
+</tbody></table></div>
+<h2 id="3-architecture-overview">3. Architecture Overview</h2>
+<pre><code>
+┌─────────────────────────────────────────────────────────────┐
+│                     PDFoid Application                       │
+├─────────────────────────────────────────────────────────────┤
+│  Header (Branding, File Name Display)                        │
+├───────────────────────┬─────────────────────────────────────┤
+│                       │                                       │
+│  PDF Viewer           │  Right Sidebar (Tools &amp; AI)         │
+│  - Canvas Rendering   │  - PDF Uploader                     │
+│  - Zoom Controls      │  - AI Summary Card                  │
+│  - Page Navigation    │  - Keywords Card                    │
+│  - Annotation Layer   │  - Metadata Display                 │
+│  (Future)             │                                       │
+│                       │                                       │
+└───────────────────────┴─────────────────────────────────────┘
+
+Built-in AI Services:
+├─ TextRank Summarization (sentence scoring via PageRank)
+├─ RAKE Keyword Extraction (rapid automatic keyword extraction)
+├─ TF-IDF Text Analysis
+└─ Rule-Based Grammar/Form Suggestions (future)
+
+Data Flow:
+User Upload → File Reading → Text Extraction → AI Processing → UI Display
+</code></pre>
+<h2 id="4-component-structure">4. Component Structure</h2>
+<h3 id="core-components">Core Components</h3>
+<p>#### <code>App.tsx</code> (Main Container)</p>
+<ul>
+<li><strong>Purpose</strong>: Root layout with split-pane design, state management</li>
+<li><strong>State</strong>: <code>pdfData</code>, <code>fileName</code>, <code>summary</code>, <code>keywords</code></li>
+<li><strong>Children</strong>: <code>PDFUploader</code>, <code>PDFViewer</code></li>
+<li><strong>Styling</strong>: Light gradient background, Tailwind glassmorphism for cards</li>
+</ul>
+<p>#### <code>PDFUploader.tsx</code></p>
+<ul>
+<li><strong>Purpose</strong>: File upload, text extraction, AI processing orchestration</li>
+<li><strong>Features</strong>:</li>
+</ul>
+<p>  - Drag-and-drop interface with visual feedback</p>
+<p>  - Progress tracking (33% load, 50% extract, 75% analyze, 100% done)</p>
+<p>  - ArrayBuffer cloning (prevents pdf.js worker detachment errors)</p>
+<p>  - Automatic AI summarization &amp; keyword extraction</p>
+<ul>
+<li><strong>Critical Detail</strong>: Must clone buffer before passing to both viewer and text extractor</li>
+</ul>
+<p>#### <code>PDFViewer.tsx</code></p>
+<ul>
+<li><strong>Purpose</strong>: Canvas-based PDF rendering with navigation</li>
+<li><strong>Features</strong>:</li>
+</ul>
+<p>  - Zoom 50%-300% with buttons</p>
+<p>  - Page navigation (Previous/Next)</p>
+<p>  - Error handling with user-friendly messages</p>
+<p>  - Responsive canvas sizing to container</p>
+<ul>
+<li><strong>Worker Config</strong>: Must use matching pdfjs-dist version (currently 3.11.174)</li>
+</ul>
+<h3 id="utility-modules">Utility Modules</h3>
+<p>#### <code>utils/ai.ts</code></p>
+<ul>
+<li><strong><code>summarizeText(text, options)</code></strong>: Returns concise summary using TextRank algorithm</li>
+<li><strong><code>extractKeywords(text, options)</code></strong>: Returns top keywords using TF-IDF scoring</li>
+<li><strong>Run in Web Worker</strong> (future optimization): Move CPU-intensive operations off main thread</li>
+</ul>
+<h2 id="5-styling-system">5. Styling System</h2>
+<h3 id="tailwind-css-setup">Tailwind CSS Setup</h3>
+<p><strong>PostCSS Configuration</strong> (<code>postcss.config.js</code>):</p>
+<pre><code class="language-javascript">
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+</code></pre>
+<p><strong>Tailwind Config</strong> (<code>tailwind.config.js</code>):</p>
+<ul>
+<li>Content scanning: <code>./index.html</code>, <code>./src/*<em>/</em>.{ts,tsx,js,jsx}</code></li>
+<li>Extensions: Custom colors, animations, dark mode (future)</li>
+</ul>
+<p><strong>Global Styles</strong> (<code>styles.css</code>):</p>
+<pre><code class="language-css">
+@tailwind base;        /* Browser reset + base styles */
+@tailwind components;  /* Component definitions */
+@tailwind utilities;   /* Utility classes */
+</code></pre>
+<h3 id="design-tokens">Design Tokens</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Element</th><th>Color</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Primary</td><td>Indigo-500 → Purple-600</td><td>CTA buttons, accents</td></tr>
+<tr><td>Secondary</td><td>Gray-200 → Gray-300</td><td>Neutral UI elements</td></tr>
+<tr><td>Success</td><td>Emerald-500 → Teal-600</td><td>AI summaries, positive states</td></tr>
+<tr><td>Attention</td><td>Red-500</td><td>Errors, warnings</td></tr>
+<tr><td>Background</td><td>White / Gray-50</td><td>Card backgrounds</td></tr>
+<tr><td>Text (Primary)</td><td>Gray-800</td><td>Headers, main text</td></tr>
+<tr><td>Text (Secondary)</td><td>Gray-600</td><td>Helper text, descriptions</td></tr>
+</tbody></table></div>
+<h3 id="layout-patterns">Layout Patterns</h3>
+<ul>
+<li><strong>Header</strong>: White bg, solid shadow, clear typography</li>
+<li><strong>Cards</strong>: White/gradient bg, rounded-2xl, shadow-xl, border</li>
+<li><strong>Buttons</strong>: Gradient fills (indigo→purple), hover scale/shadow effects, rounded-lg</li>
+<li><strong>Progress Bar</strong>: Animated gradient (indigo→purple→indigo), pulse animation</li>
+<li><strong>Error States</strong>: Red-100 background with red-500 icon + red-600 text</li>
+</ul>
+<h2 id="6-data-flow-state-management">6. Data Flow &amp; State Management</h2>
+<h3 id="current-react-usestate">Current: React useState</h3>
+<ul>
+<li>Simple, component-level state for MVP</li>
+<li><code>App.tsx</code> holds: <code>pdfData</code>, <code>fileName</code>, <code>summary</code>, <code>keywords</code></li>
+<li>Callbacks: <code>handleLoadPDF()</code>, <code>handleSummarize()</code></li>
+</ul>
+<h3 id="future-zustand-store-when-needed">Future: Zustand Store (when needed)</h3>
+<pre><code class="language-typescript">
+// Planned structure:
+interface AppState {
+  // PDF Data
+  pdfData: ArrayBuffer | null;
+  fileName: string;
+  currentPage: number;
+  totalPages: number;
+
+  // AI Results
+  summary: string;
+  keywords: string[];
+
+  // UI State
+  isLoading: boolean;
+  error: string | null;
+
+  // Annotations
+  annotations: Annotation[];
+}
+</code></pre>
+<h2 id="7-critical-implementation-details">7. Critical Implementation Details</h2>
+<h3 id="arraybuffer-management-pdf-js-limitation">ArrayBuffer Management (pdf.js Limitation)</h3>
+<p><strong>Problem</strong>: pdf.js transfers (not copies) ArrayBuffers to workers, detaching original</p>
+<p><strong>Solution</strong>: Clone buffer before each consumer</p>
+<pre><code class="language-typescript">
+const bufferForViewer = originalBuffer.slice(0);     // Deep clone
+const bufferForExtraction = originalBuffer.slice(0); // Separate clone
+// Each consumer gets independent buffer
+</code></pre>
+<h3 id="worker-configuration">Worker Configuration</h3>
+<ul>
+<li><strong>Current</strong>: CDN-based worker from unpkg.com</li>
+<li><strong>URL</strong>: <code>https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js</code></li>
+<li><strong>Critical</strong>: Must match installed pdfjs-dist version exactly</li>
+<li><strong>Future</strong>: Self-host worker for production</li>
+</ul>
+<h3 id="text-extraction-pipeline">Text Extraction Pipeline</h3>
+<p>1. Load PDF via <code>pdfjs-dist</code></p>
+<p>2. Iterate pages 1 to numPages</p>
+<p>3. Extract text items from each page's content</p>
+<p>4. Join into continuous text with page breaks</p>
+<p>5. Pass to AI utilities for processing</p>
+<h2 id="8-error-handling-strategy">8. Error Handling Strategy</h2>
+<h3 id="user-facing-errors">User-Facing Errors</h3>
+<ul>
+<li>PDF too large: Show info message</li>
+<li>Corrupted PDF: Display error card with icon + text</li>
+<li>Network failures: Graceful degradation (built-in AI always available)</li>
+</ul>
+<h3 id="developer-debugging">Developer Debugging</h3>
+<ul>
+<li>Console logs in components (dev mode only)</li>
+<li>Error boundaries (future)</li>
+<li>Sentry integration (production monitoring, future)</li>
+</ul>
+<h2 id="9-performance-optimization-strategy">9. Performance Optimization Strategy</h2>
+<h3 id="current-state">Current State</h3>
+<ul>
+<li>Lazy page rendering (render visible pages only, future)</li>
+<li>ArrayBuffer cloning (unavoidable for pdf.js)</li>
+</ul>
+<h3 id="future-optimizations">Future Optimizations</h3>
+<ul>
+<li>Web Workers: Offload text extraction and AI processing</li>
+<li>Virtual scrolling: Thumbnail strip with hundreds of pages</li>
+<li>Memoization: React.memo for PDFViewer to prevent re-renders</li>
+<li>Code splitting: Separate chunks for annotations, PDF manipulation</li>
+</ul>
+<h2 id="10-accessibility-mobile-design">10. Accessibility &amp; Mobile Design</h2>
+<h3 id="accessibility">Accessibility</h3>
+<ul>
+<li>Semantic HTML (buttons, labels, roles)</li>
+<li>Color contrast WCAG AA compliance</li>
+<li>Keyboard navigation support</li>
+<li>ARIA labels for interactive elements</li>
+<li>Screen reader friendly error messages</li>
+</ul>
+<h3 id="responsive-design">Responsive Design</h3>
+<ul>
+<li>Mobile-first approach</li>
+<li>Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)</li>
+<li>Single-column layout on mobile</li>
+<li>Touch-friendly button sizes (min 44x44px)</li>
+<li>Scrollable panels for small screens</li>
+</ul>
+<h2 id="11-feature-roadmap-priority-order">11. Feature Roadmap (Priority Order)</h2>
+<h3 id="phase-1-mvp-current">Phase 1: MVP (Current)</h3>
+<ul>
+<li>✅ PDF viewer with zoom &amp; navigation</li>
+<li>✅ Text extraction</li>
+<li>✅ Built-in AI summarization &amp; keywords</li>
+<li>⏳ Fix CSS not loading issue</li>
+<li>⏳ Fix PDF preview not rendering</li>
+</ul>
+<h3 id="phase-2-annotations-1-2-weeks">Phase 2: Annotations (1-2 weeks)</h3>
+<ul>
+<li>[ ] Overlay canvas for annotations</li>
+<li>[ ] Highlight tool (select text, highlight color)</li>
+<li>[ ] Text note tool (add sticky notes)</li>
+<li>[ ] Drawing/pen tool (freehand annotations)</li>
+<li>[ ] Shape tool (rectangles, circles)</li>
+<li>[ ] Annotation persistence (JSON sidecar)</li>
+</ul>
+<h3 id="phase-3-pdf-manipulation-1-week">Phase 3: PDF Manipulation (1 week)</h3>
+<ul>
+<li>[ ] pdf-lib integration</li>
+<li>[ ] Add/remove pages</li>
+<li>[ ] Image insertion</li>
+<li>[ ] Basic text editing</li>
+<li>[ ] Flatten annotations</li>
+<li>[ ] Export to new PDF</li>
+</ul>
+<h3 id="phase-4-advanced-features-2-weeks">Phase 4: Advanced Features (2 weeks)</h3>
+<ul>
+<li>[ ] OCR (Tesseract.js for scanned PDFs)</li>
+<li>[ ] Form detection &amp; autofill</li>
+<li>[ ] Page merge/split</li>
+<li>[ ] Digital signatures</li>
+<li>[ ] Cloud storage (Google Drive, OneDrive)</li>
+</ul>
+<h3 id="phase-5-production-2-3-days">Phase 5: Production (2-3 days)</h3>
+<ul>
+<li>[ ] Unit tests (Jest)</li>
+<li>[ ] E2E tests (Playwright)</li>
+<li>[ ] GitHub Actions CI/CD</li>
+<li>[ ] Deployment (Netlify/Vercel)</li>
+<li>[ ] Documentation &amp; examples</li>
+</ul>
+<h2 id="12-common-gotchas-solutions">12. Common Gotchas &amp; Solutions</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Issue</th><th>Root Cause</th><th>Fix</th></tr></thead><tbody>
+<tr><td>PDF not rendering</td><td>Version mismatch (API vs Worker)</td><td>Sync pdfjs-dist version, use exact CDN URL</td></tr>
+<tr><td>ArrayBuffer detached error</td><td>pdf.js worker transfers buffer</td><td>Clone with <code>.slice(0)</code> before each use</td></tr>
+<tr><td>Tailwind styles not applying</td><td>CSS not being imported or PostCSS misconfigured</td><td>Ensure <code>@tailwind</code> directives in styles.css, restart dev server</td></tr>
+<tr><td>Page appears blank/dark</td><td>Background colors too dark or transparent</td><td>Use light solid colors (white/gray-50), avoid <code>bg-black/80</code></td></tr>
+<tr><td>UI doesn't update after file upload</td><td>Missing state setter call</td><td>Verify callbacks passed to children, check dependencies</td></tr>
+</tbody></table></div>
+<h2 id="13-code-quality-standards">13. Code Quality Standards</h2>
+<h3 id="before-each-commit">Before Each Commit</h3>
+<ul>
+<li>[ ] No console.log() in production code (except errors)</li>
+<li>[ ] All components have TypeScript types</li>
+<li>[ ] No prop drilling &gt; 2 levels (use context/state mgmt)</li>
+<li>[ ] Tailwind classes organized: layout → spacing → sizing → colors → effects</li>
+<li>[ ] Component prop drilling kept minimal</li>
+<li>[ ] Error handling present (try/catch in async functions)</li>
+<li>[ ] Accessibility basics: semantic HTML, alt text, focus states</li>
+</ul>
+<h3 id="file-organization">File Organization</h3>
+<pre><code>
+src/
+├─ components/
+│  ├─ PDFViewer.tsx      (PDF rendering)
+│  ├─ PDFUploader.tsx    (File upload &amp; AI)
+│  ├─ AnnotationCanvas.tsx (Future)
+│  └─ ...
+├─ utils/
+│  ├─ ai.ts              (TextRank, RAKE)
+│  ├─ pdf.ts             (PDF utilities, future)
+│  └─ ...
+├─ types/
+│  └─ index.ts           (Shared TypeScript interfaces)
+├─ App.tsx               (Main layout)
+├─ main.tsx              (Entry point)
+└─ styles.css            (Global Tailwind styles)
+</code></pre>
+<h2 id="14-testing-strategy-future">14. Testing Strategy (Future)</h2>
+<h3 id="unit-tests-jest">Unit Tests (Jest)</h3>
+<ul>
+<li>AI utilities: <code>summarizeText()</code>, <code>extractKeywords()</code></li>
+<li>Utility functions: text parsing, data transforms</li>
+</ul>
+<h3 id="integration-tests">Integration Tests</h3>
+<ul>
+<li>PDF upload → text extraction → AI processing</li>
+<li>Component interactions: uploader ↔ viewer ↔ sidebar</li>
+</ul>
+<h3 id="e2e-tests-playwright">E2E Tests (Playwright)</h3>
+<ul>
+<li>Upload PDF → verify viewer renders → check summary displays</li>
+<li>Zoom controls → verify canvas scales</li>
+<li>Page navigation → verify correct page displays</li>
+</ul>
+<h2 id="15-deployment-checklist">15. Deployment Checklist</h2>
+<ul>
+<li>[ ] Environment variables configured (.env.production)</li>
+<li>[ ] Worker URL points to CDN (not local file)</li>
+<li>[ ] Source maps disabled in production build</li>
+<li>[ ] Analytics/error tracking set up</li>
+<li>[ ] Performance budgets met (&lt; 300KB JS)</li>
+<li>[ ] All components tested on target browsers</li>
+<li>[ ] Mobile responsiveness verified</li>
+<li>[ ] Accessibility audit completed</li>
+</ul>
+<p>---</p>
+<p><strong>Last Updated</strong>: October 27, 2025</p>
+<p><strong>Version</strong>: 1.0 (Initial Deep Wiki)</p>
+<p><strong>Maintainer</strong>: Development Team</p>
+    </article>
+    <div class="related"><h3>Related pages</h3><div class="rel-grid"><a class="rel-card" href="ARCHITECTURE_IMPROVEMENTS.html"><b>Architecture Improvements</b><span>This implementation improves Phase 1 stability and visual accuracy by fixing fundamental issues in the canvas rendering pipeline and toolbar layout. All changes align with globalru</span></a><a class="rel-card" href="AUDIT_IMPROVEMENTS_2026-07-10.html"><b>Audit Improvements 2026 07 10</b><span>Product: PDFoid</span></a><a class="rel-card" href="COMPLETION_REPORT.html"><b>Completion Report</b><span>Date: October 29, 2025</span></a><a class="rel-card" href="DOCUMENTATION_INDEX.html"><b>Documentation Index</b><span>﻿# Documentation Index</span></a></div></div>
+    <div class="pager"><a href="COMPLETION_REPORT.html"><span class="k">Previous</span>Completion Report</a><a href="DOCUMENTATION_INDEX.html"><span class="k">Next</span>Documentation Index</a></div>
+    <div class="footer-note">PDFoid · Quantumide-style ultra-linked docs · Apache-2.0 · Lehro Solutions</div>
+  </main>
+  <div class="toc"><h4>On this page</h4><a href="#top">Overview</a></div>
+</div>
+
+<script>
+(function(){
+  const bar=document.querySelector('.progress');
+  const tocLinks=[...document.querySelectorAll('.toc a')];
+  const menu=document.querySelector('.menu-btn');
+  const side=document.querySelector('.side');
+  if(menu&&side){menu.addEventListener('click',()=>side.classList.toggle('open'));}
+  function onScroll(){
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    const p=max>0?(h.scrollTop/max)*100:0;
+    if(bar) bar.style.width=p+'%';
+    const heads=[...document.querySelectorAll('main h2[id], main h3[id]')];
+    let current='';
+    for(const el of heads){ if(el.getBoundingClientRect().top<=120) current=el.id; }
+    tocLinks.forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+current));
+  }
+  document.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+</script>
+
+</body>
+</html>

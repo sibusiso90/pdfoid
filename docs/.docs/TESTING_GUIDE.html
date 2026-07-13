@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<title>PDFoid · Testing Guide</title>
+<style>:root{--canvas:#eef1f4;--canvas-2:#f7f9fb;--surface:#ffffff;--surface-2:#e5e9ee;--surface-3:#d7dde5;--border:rgba(15,23,42,.12);--border-strong:rgba(15,23,42,.2);--ink:#111827;--ink-2:#374151;--muted:#667085;--gold:#2457d6;--gold-2:#1d49b8;--gold-soft:rgba(36,87,214,.10);--azure:#2457d6;--live:#0f766e;--coral:#b91c1c;--warning:#b45309;--spine:linear-gradient(90deg,#2457d6,#38bdf8,#6366f1);--display:Georgia, 'Times New Roman', serif;--font:Arial, Helvetica, sans-serif;--mono:Consolas, monospace;--radius-sm:6px;--radius:10px;--radius-lg:14px;--shadow:0 18px 40px rgba(15,23,42,.08);--shadow-sm:0 2px 10px rgba(0,0,0,.12);--link:#2457d6;--sidebar-w:262px;--toc-w:212px;}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.68 var(--font);color:var(--ink-2);background:radial-gradient(1100px 620px at 8% -6%,rgba(36,87,214,.08),transparent 60%),radial-gradient(950px 520px at 104% 1%,rgba(99,102,241,.06),transparent 55%),var(--canvas);}a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}::selection{background:var(--gold-soft);color:var(--ink)}.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--spine);z-index:60;transition:width .1s linear}.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:13px 22px;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;text-decoration:none}.brand:hover{text-decoration:none}.mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);background:var(--gold-soft);border-radius:var(--radius-sm);font:800 11px/1 var(--mono);letter-spacing:.06em}.crumb{color:var(--muted);font-size:.86rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.crumb b{color:var(--ink-2);font-weight:700}.menu-btn{display:none;margin-left:auto;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:6px 11px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.shell{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr) var(--toc-w);gap:36px;max-width:1340px;margin:0 auto;padding:26px 26px 90px;align-items:start}.side{position:sticky;top:76px;max-height:calc(100vh - 98px);overflow-y:auto;padding-right:6px}.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px}.nav-group{margin-bottom:18px}.nav-h{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:7px;display:flex;align-items:center;gap:7px;font-family:var(--mono)}.side a{display:block;padding:6px 11px;border-radius:var(--radius-sm);color:var(--ink-2);font-size:.87rem;font-weight:500;line-height:1.35;border-left:2px solid transparent}.side a:hover{background:var(--surface-2);text-decoration:none;color:var(--ink)}.side a.on{background:var(--gold-soft);border-left-color:var(--gold);color:var(--gold-2)}main{min-width:0}.hero{margin-bottom:18px}.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border-strong);padding:5px 12px;border-radius:999px;font-family:var(--mono)}.hero h1{font-family:var(--display);font-size:2.6rem;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0;font-weight:400;color:var(--ink)}.hero .lead{color:var(--ink-2);font-size:1.05rem;max-width:70ch;margin:12px 0 0}.spine{height:3px;border-radius:999px;background:var(--spine);margin:20px 0 0}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px 30px}.card h2{font-family:var(--display);font-size:1.45rem;color:var(--ink);font-weight:400;margin:1.4em 0 .5em;padding-bottom:.35em;border-bottom:1px solid var(--border)}.card h2:first-child{margin-top:0}.card h3{font-size:1.02rem;color:var(--ink);margin:1.15em 0 .4em}.card p,.card li{color:var(--ink-2)}.card ul,.card ol{padding-left:1.2rem}.card li{margin:.35em 0}code,pre{font-family:var(--mono)}code{background:var(--gold-soft);padding:.12em .38em;border-radius:6px;font-size:.9em}pre{overflow:auto;background:var(--canvas-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;line-height:1.5}pre code{background:transparent;padding:0}.table-wrap{overflow:auto;margin:1rem 0}table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{border:1px solid var(--border);padding:8px 10px;text-align:left}th{background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}.toc{position:sticky;top:76px}.toc h4{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-family:var(--mono)}.toc a{display:block;padding:5px 0 5px 10px;border-left:2px solid var(--border);color:var(--muted);font-size:.82rem}.toc a:hover{color:var(--ink);text-decoration:none}.toc a.h3{padding-left:18px;font-size:.78rem}.toc a.on{border-left-color:var(--gold);color:var(--gold-2)}.related{margin-top:28px}.related h3{font-family:var(--display);font-size:1.35rem;color:var(--ink);font-weight:400;margin:0 0 12px}.rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.rel-card{display:block;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--ink-2)}.rel-card:hover{border-color:var(--border-strong);text-decoration:none;color:var(--ink);background:var(--surface)}.rel-card b{display:block;color:var(--ink);margin-bottom:4px}.rel-card span{font-size:.84rem;color:var(--muted)}.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}.pager a{display:block;min-width:180px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink-2)}.pager a:hover{border-color:var(--gold);text-decoration:none;color:var(--ink)}.pager .k{display:block;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.footer-note{margin-top:26px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:.84rem}.wrap{max-width:1140px;margin:0 auto;padding:14px 26px 90px}.hero-lg{padding:40px 0 6px}.hero-lg h1{font-family:var(--display);font-size:3.2rem;line-height:1.04;letter-spacing:-.01em;margin:10px 0 0;font-weight:400;color:var(--ink)}.hero-lg .tag{color:var(--ink-2);font-size:1.1rem;max-width:680px;margin-top:14px}.pill{display:inline-block;margin:18px 8px 0 0;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border-strong);color:var(--ink-2);font-size:.72rem;font-weight:600;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}.search{margin:24px 0 4px;width:100%;max-width:520px;padding:13px 16px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface);box-shadow:var(--shadow-sm);font:inherit;font-size:.95rem;color:var(--ink)}.search::placeholder{color:var(--muted)}.search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}.psec{margin-top:32px}.psec h2{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:1.5rem;color:var(--ink);font-weight:400;border-top:1px solid var(--border);padding-top:22px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}.gcard{display:block;padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink-2);min-height:120px}.gcard:hover{border-color:var(--border-strong);text-decoration:none;transform:translateY(-1px);color:var(--ink)}.gcard b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:6px}.gcard span{font-size:.9rem;color:var(--muted)}.gcard .grp{display:inline-block;margin-bottom:8px;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}@media (max-width:1100px){.shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr)}.toc{display:none}}@media (max-width:860px){.shell{grid-template-columns:1fr;padding:16px}.side{position:static;max-height:none;display:none}.side.open{display:block}.menu-btn{display:inline-block}.hero h1,.hero-lg h1{font-size:2.1rem}}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}</style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="topbar">
+  <a class="brand" href="index.html"><span class="mark">PDF</span>PDFoid docs</a>
+  <span class="crumb"><a href="index.html">Docs</a> / <b>Testing Guide</b></span>
+  <button class="menu-btn" type="button">Menu</button>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Documentation"><div class="nav-group"><div class="nav-h">Guides</div><a href="architecture.html">Architecture</a><a href="catalog.html">Catalog</a><a href="design-system.html">Design System</a><a href="how-to-use.html">How To Use</a><a href="index.html">Index</a><a href="license.html">License</a><a href="roadmap.html">Roadmap</a><a href="security.html">Security</a><a href="skills.html">Skills</a><a href="../how-to-use.html">How To Use</a></div><div class="nav-group"><div class="nav-h">ADRs</div><a href="adr-0001-docs-system.html">Adr 0001 Docs System</a><a href="adr-0002-apache-2-0.html">Adr 0002 Apache 2 0</a><a href="adr-0003-package-manager-bun.html">Adr 0003 Package Manager Bun</a></div><div class="nav-group"><div class="nav-h">Project</div><a href="ARCHITECTURE_IMPROVEMENTS.html">Architecture Improvements</a><a href="AUDIT_IMPROVEMENTS_2026-07-10.html">Audit Improvements 2026 07 10</a><a href="COMPLETION_REPORT.html">Completion Report</a><a href="DEEPWIKI.html">Deepwiki</a><a href="DOCUMENTATION_INDEX.html">Documentation Index</a><a href="IMPLEMENTATION_SUMMARY.html">Implementation Summary</a><a href="IMPROVEMENTS_SUMMARY.html">Improvements Summary</a><a href="PHASE_1_IMPLEMENTATION.html">Phase 1 Implementation</a><a href="SECURITY_ISSUES_2026-07-10.html">Security Issues 2026 07 10</a><a class="on" href="TESTING_GUIDE.html">Testing Guide</a><a href="UPGRADE_COMPLETION_2026-07-10.html">Upgrade Completion 2026 07 10</a><a href="codebase-map.html">Codebase Map</a><a href="global_rules.html">Global Rules</a><a href="glossary.html">Glossary</a><a href="improved_dev_rules.html">Improved Dev Rules</a><a href="known-limitations.html">Known Limitations</a><a href="open-source-distribution.html">Open Source Distribution</a><a href="pdf-pipeline.html">Pdf Pipeline</a><a href="state-management.html">State Management</a></div></nav>
+  <main id="top">
+    <header class="hero">
+      <span class="eyebrow">Cold-neutral cobalt</span>
+      <h1>Testing Guide</h1>
+      <p class="lead">Objective: Verify the PDF top is not clipped vertically</p>
+      <div class="spine"></div>
+    </header>
+    <article class="card">
+<h2 id="quick-start">Quick Start</h2>
+<pre><code class="language-bash">
+# Dev server already running at http://localhost:5174/
+# Open in browser: http://localhost:5174/
+</code></pre>
+<p>---</p>
+<h2 id="test-scenarios">Test Scenarios</h2>
+<h3 id="test-1-pdf-top-visibility">Test 1: PDF Top Visibility ✓</h3>
+<p><strong>Objective</strong>: Verify the PDF top is not clipped vertically</p>
+<p>1. Open the app: http://localhost:5174/</p>
+<p>2. Upload a PDF (any PDF works)</p>
+<p>3. Look at the PDF in the canvas area</p>
+<p>4. <strong>Expected</strong>: Can see the very top of the PDF, no content cut off</p>
+<p>5. <strong>Before fix</strong>: Top would be visually centered, losing the header/first content</p>
+<p>6. <strong>After fix</strong>: Natural scroll from top, first page content visible immediately</p>
+<p><strong>Verification</strong>: ✅ PDF top shows content clearly  </p>
+<p><strong>Failure</strong>: ❌ First content of PDF is cut off</p>
+<p>---</p>
+<h3 id="test-2-pixel-perfect-drawing-core-fix">Test 2: Pixel-Perfect Drawing (Core Fix)</h3>
+<p><strong>Objective</strong>: Verify tools draw on PDF pixels, not scaled screen pixels</p>
+<p>1. Upload a PDF with text or clear content boundaries</p>
+<p>2. Zoom to <strong>100%</strong> (click "100%" button in toolbar)</p>
+<p>3. Select <strong>Pen</strong> tool (✏️)</p>
+<p>4. Draw a small circle or line on the PDF content</p>
+<p>5. Zoom in to <strong>200%</strong> (click Zoom In or ctrl++)</p>
+<p>6. <strong>Expected</strong>: The line you drew is still where you drew it, perfectly aligned</p>
+<p>7. Compare to text/images beneath — should align exactly</p>
+<p><strong>Verification Steps</strong>:</p>
+<ul>
+<li>Draw on a text line, zoom in → the pen stroke should align perfectly with the text</li>
+<li>Draw on an image edge, zoom in → stroke should trace the edge correctly</li>
+<li>Toggle fit-to-width/fit-to-page → strokes should not shift</li>
+</ul>
+<p><strong>Before fix</strong>: Strokes would appear offset or at wrong location after zoom  </p>
+<p><strong>After fix</strong>: Strokes always align with PDF content</p>
+<p><strong>Verification</strong>: ✅ Strokes perfectly align with PDF content at all zoom levels  </p>
+<p><strong>Failure</strong>: ❌ Strokes are offset or misaligned</p>
+<p>---</p>
+<h3 id="test-3-zoom-after-drawing">Test 3: Zoom After Drawing</h3>
+<p><strong>Objective</strong>: Verify zoom doesn't break annotation positions</p>
+<p>1. Upload a PDF</p>
+<p>2. Select <strong>Highlight</strong> tool (🔆)</p>
+<p>3. Highlight a sentence in the PDF</p>
+<p>4. Click <strong>Fit to Width</strong> button</p>
+<p>5. Click <strong>Fit to Page</strong> button  </p>
+<p>6. Click <strong>100%</strong> button</p>
+<p>7. <strong>Expected</strong>: Highlight stays in the exact same position, never shifts or jumps</p>
+<p>8. The highlighted text should always be the same text, no matter the zoom level</p>
+<p><strong>Verification</strong>: ✅ Highlight stays on same text at all zoom levels  </p>
+<p><strong>Failure</strong>: ❌ Highlight shifts to different location or text</p>
+<p>---</p>
+<h3 id="test-4-eraser-hit-detection">Test 4: Eraser Hit Detection</h3>
+<p><strong>Objective</strong>: Verify eraser correctly identifies which annotation to delete</p>
+<p>1. Upload a PDF</p>
+<p>2. Draw 3 separate pen strokes in different locations</p>
+<p>3. Add a highlight over one area</p>
+<p>4. Select <strong>Eraser</strong> tool (🧹)</p>
+<p>5. Hover over one pen stroke</p>
+<p>6. <strong>Expected</strong>: That stroke gets a red dashed outline (preview)</p>
+<p>7. Click on it → that specific stroke is deleted</p>
+<p>8. Hover over the highlight</p>
+<p>9. <strong>Expected</strong>: Highlight gets red dashed outline</p>
+<p>10. Click → highlight is deleted</p>
+<p><strong>Before fix</strong>: Eraser might detect wrong annotation due to coordinate mismatch  </p>
+<p><strong>After fix</strong>: Always targets correct annotation under cursor</p>
+<p><strong>Verification</strong>: ✅ Eraser correctly identifies hovered annotations  </p>
+<p><strong>Failure</strong>: ❌ Eraser deletes wrong annotation or misses target</p>
+<p>---</p>
+<h3 id="test-5-pointer-selection">Test 5: Pointer Selection</h3>
+<p><strong>Objective</strong>: Verify pointer tool can select annotations accurately</p>
+<p>1. Upload a PDF</p>
+<p>2. Draw multiple annotations (pen, rectangle, highlight)</p>
+<p>3. Select <strong>Pointer</strong> tool (👆)</p>
+<p>4. Click on one pen stroke</p>
+<p>5. <strong>Expected</strong>: That pen stroke gets selected (shows blue dashed box around it)</p>
+<p>6. Annotation appears highlighted in the right sidebar annotation list</p>
+<p>7. Click on a different annotation</p>
+<p>8. <strong>Expected</strong>: Previous selection is deselected, new one is selected</p>
+<p><strong>Before fix</strong>: Selection box might appear in wrong location  </p>
+<p><strong>After fix</strong>: Always appears exactly around the annotation</p>
+<p><strong>Verification</strong>: ✅ Selection boxes appear around correct annotations  </p>
+<p><strong>Failure</strong>: ❌ Selection boxes appear in wrong place</p>
+<p>---</p>
+<h3 id="test-6-toolbar-scrolling">Test 6: Toolbar Scrolling</h3>
+<p><strong>Objective</strong>: Verify toolbar scrolls when content overflows</p>
+<p>1. Make browser window very narrow (375px wide on mobile simulator)</p>
+<p>2. Upload a PDF</p>
+<p>3. Look at the annotation toolbar on the right side</p>
+<p>4. <strong>Expected</strong>: All controls fit and scroll smoothly if needed</p>
+<p>5. Try adding many annotations (10+) to the same page</p>
+<p>6. <strong>Expected</strong>: Annotation list scrolls independently within toolbar</p>
+<p>7. Scroll down in annotation list</p>
+<p>8. <strong>Expected</strong>: Can see all annotations by scrolling</p>
+<p><strong>Before fix</strong>: Content would be cut off with no scroll capability  </p>
+<p><strong>After fix</strong>: Everything scrolls smoothly</p>
+<p><strong>Verification</strong>: ✅ Toolbar and annotation list scroll on small viewports  </p>
+<p><strong>Failure</strong>: ❌ Content is cut off or doesn't scroll</p>
+<p>---</p>
+<h3 id="test-7-high-dpi-display-if-available">Test 7: High-DPI Display (if available)</h3>
+<p><strong>Objective</strong>: Verify strokes are sharp on high-DPI displays</p>
+<p>1. On a Mac or high-DPI Windows display (125%, 150%, or 200% scaling)</p>
+<p>2. Upload a PDF</p>
+<p>3. Draw a pen stroke</p>
+<p>4. <strong>Expected</strong>: Stroke appears sharp, not blurry or pixelated</p>
+<p>5. <strong>Expected</strong>: Stroke aligns perfectly with PDF content</p>
+<p><strong>Before fix</strong>: Strokes might be blurry due to devicePixelRatio scaling issues  </p>
+<p><strong>After fix</strong>: Strokes render sharply with correct alignment</p>
+<p><strong>Verification</strong>: ✅ Strokes are sharp and aligned  </p>
+<p><strong>Failure</strong>: ❌ Strokes are blurry or misaligned</p>
+<p>---</p>
+<h3 id="test-8-annotation-list-height">Test 8: Annotation List Height</h3>
+<p><strong>Objective</strong>: Verify annotation list uses available viewport space</p>
+<p>1. Resize browser to different heights</p>
+<p>2. Add many annotations (20+) to a page</p>
+<p>3. On large viewport (1200px tall): </p>
+<p>   - <strong>Expected</strong>: Annotation list takes ~60% of remaining space</p>
+<p>4. On small viewport (600px tall):</p>
+<p>   - <strong>Expected</strong>: Annotation list still takes ~60%, scrolls nicely</p>
+<p>5. On mobile (400px tall):</p>
+<p>   - <strong>Expected</strong>: Annotation list is still usable and scrollable</p>
+<p><strong>Before fix</strong>: Fixed 16rem height would waste space or not adapt  </p>
+<p><strong>After fix</strong>: Responsive 60vh height adapts to screen</p>
+<p><strong>Verification</strong>: ✅ Annotation list scales responsively  </p>
+<p><strong>Failure</strong>: ❌ List is too small or too large for viewport</p>
+<p>---</p>
+<h2 id="automated-checks">Automated Checks</h2>
+<h3 id="build-status">Build Status</h3>
+<pre><code class="language-bash">
+npm run build
+# Expected: ✓ built in ~3s, only warnings about pdf.js
+# Failure: ❌ TypeScript errors or build failure
+</code></pre>
+<h3 id="dev-server-status">Dev Server Status</h3>
+<pre><code class="language-bash">
+npm run dev
+# Expected: ✓ VITE ready in ~400ms, running at http://localhost:5174/
+# Failure: ❌ Port conflict or build error
+</code></pre>
+<p>---</p>
+<h2 id="visual-test-checklist">Visual Test Checklist</h2>
+<p>Print this and check off as you test:</p>
+<ul>
+<li>[ ] <strong>PDF Top Visibility</strong>: First page content visible from the top</li>
+<li>[ ] <strong>100% Zoom Drawing</strong>: Pen/highlight align perfectly with text/images</li>
+<li>[ ] <strong>Zoom Changes</strong>: Annotations don't shift when zooming in/out  </li>
+<li>[ ] <strong>Fit-to-Width</strong>: Highlight stays on same text</li>
+<li>[ ] <strong>Fit-to-Page</strong>: All annotations maintain position</li>
+<li>[ ] <strong>Eraser Preview</strong>: Red outline appears on correct annotation</li>
+<li>[ ] <strong>Eraser Delete</strong>: Deletes the annotation under cursor, not nearby ones</li>
+<li>[ ] <strong>Pointer Select</strong>: Selection box appears around clicked annotation</li>
+<li>[ ] <strong>Pointer Deselect</strong>: Clicking empty area deselects current selection</li>
+<li>[ ] <strong>Toolbar Scroll</strong>: Toolbar scrolls on narrow viewport</li>
+<li>[ ] <strong>Annotation List Scroll</strong>: List scrolls when many annotations exist</li>
+<li>[ ] <strong>Smooth Scrolling</strong>: No jank or stuttering when scrolling</li>
+<li>[ ] <strong>Responsive Height</strong>: Annotation list adapts to viewport size</li>
+<li>[ ] <strong>Mobile Viewport</strong>: All features work on 375px width</li>
+</ul>
+<p>---</p>
+<h2 id="known-limitations">Known Limitations</h2>
+<p>1. <strong>PDF.js Worker URL</strong>: Hard-coded to CDN (v3.11.174) — if network fails, PDF won't load</p>
+<p>   - <strong>Fix</strong>: Later phase — support offline worker</p>
+<p>2. <strong>Chunk Size Warning</strong>: PDF.js and React make the bundle large (~600KB)</p>
+<p>   - <strong>Fix</strong>: Later phase — code-split or dynamic imports</p>
+<p>3. <strong>No OCR yet</strong>: Text extraction works but OCR not implemented</p>
+<p>   - <strong>Fix</strong>: Phase 2 with Web Worker</p>
+<p>---</p>
+<h2 id="debugging-tips">Debugging Tips</h2>
+<h3 id="if-annotations-disappear-after-zoom">If annotations disappear after zoom:</h3>
+<p>1. Check browser console (F12) for errors</p>
+<p>2. Verify localStorage/IndexedDB not full</p>
+<p>3. Check Redux DevTools (if installed) for store state</p>
+<h3 id="if-eraser-doesn-t-work">If eraser doesn't work:</h3>
+<p>1. Open DevTools → Elements</p>
+<p>2. Inspect the canvas element</p>
+<p>3. Check canvas.width and canvas.style.width are equal</p>
+<p>4. Try drawing a new annotation and erasing it</p>
+<h3 id="if-drawing-is-offset">If drawing is offset:</h3>
+<p>1. Open DevTools → Console</p>
+<p>2. Type: <code>const canvas = document.querySelector('canvas'); console.log(canvas.width, canvas.getBoundingClientRect().width)</code></p>
+<p>3. These two numbers should be equal (or in same ratio as zoom)</p>
+<h3 id="if-toolbar-doesn-t-scroll">If toolbar doesn't scroll:</h3>
+<p>1. Inspect toolbar element</p>
+<p>2. Verify <code>overflow-auto</code> is on the inner container (not <code>overflow-hidden</code>)</p>
+<p>3. Verify the content height exceeds the container height</p>
+<p>---</p>
+<h2 id="success-criteria">Success Criteria</h2>
+<p><strong>Phase 1 UI/UX is complete when:</strong></p>
+<p>✅ All 8 test scenarios pass  </p>
+<p>✅ No console errors during normal use  </p>
+<p>✅ Build completes successfully  </p>
+<p>✅ Dev server runs without issues  </p>
+<p>✅ Visual inspection shows no clipping or offset issues  </p>
+<p>---</p>
+<h2 id="report-issues">Report Issues</h2>
+<p>If you find a failing test:</p>
+<p>1. <strong>Screenshot</strong>: Take a screenshot of the issue</p>
+<p>2. <strong>Reproduction</strong>: Clear steps to reproduce</p>
+<p>3. <strong>Expected vs. Actual</strong>: What should happen vs. what happens</p>
+<p>4. <strong>Browser/Device</strong>: Chrome, Firefox, Safari, mobile, etc.</p>
+<p>5. <strong>Console Errors</strong>: Any errors in DevTools console?</p>
+<p>Example issue report:</p>
+<p>&gt; <strong>Test 2 Failure</strong>: Pen stroke offset after zoom</p>
+<p>&gt; - Steps: Draw line at 100%, zoom to 200%</p>
+<p>&gt; - Expected: Line stays in same place</p>
+<p>&gt; - Actual: Line jumps 50px to the right</p>
+<p>&gt; - Browser: Chrome 129, Windows 11</p>
+<p>&gt; - Console: No errors</p>
+<p>---</p>
+<h2 id="next-steps-after-testing">Next Steps After Testing</h2>
+<p>1. <strong>Fix any failures</strong> — re-run failing test after fix</p>
+<p>2. <strong>Code review</strong> — share implementation with team</p>
+<p>3. <strong>Accessibility audit</strong> — verify WCAG AA compliance</p>
+<p>4. <strong>Performance profile</strong> — check frame rate while drawing</p>
+<p>5. <strong>Mobile test</strong> — real iPhone/Android device if possible</p>
+    </article>
+    <div class="related"><h3>Related pages</h3><div class="rel-grid"><a class="rel-card" href="ARCHITECTURE_IMPROVEMENTS.html"><b>Architecture Improvements</b><span>This implementation improves Phase 1 stability and visual accuracy by fixing fundamental issues in the canvas rendering pipeline and toolbar layout. All changes align with globalru</span></a><a class="rel-card" href="AUDIT_IMPROVEMENTS_2026-07-10.html"><b>Audit Improvements 2026 07 10</b><span>Product: PDFoid</span></a><a class="rel-card" href="COMPLETION_REPORT.html"><b>Completion Report</b><span>Date: October 29, 2025</span></a><a class="rel-card" href="DEEPWIKI.html"><b>Deepwiki</b><span>Primary Objective: Build a high-quality, AI-assisted PDF editor with built-in local AI capabilities.</span></a></div></div>
+    <div class="pager"><a href="SECURITY_ISSUES_2026-07-10.html"><span class="k">Previous</span>Security Issues 2026 07 10</a><a href="UPGRADE_COMPLETION_2026-07-10.html"><span class="k">Next</span>Upgrade Completion 2026 07 10</a></div>
+    <div class="footer-note">PDFoid · Quantumide-style ultra-linked docs · Apache-2.0 · Lehro Solutions</div>
+  </main>
+  <div class="toc"><h4>On this page</h4><a href="#top">Overview</a></div>
+</div>
+
+<script>
+(function(){
+  const bar=document.querySelector('.progress');
+  const tocLinks=[...document.querySelectorAll('.toc a')];
+  const menu=document.querySelector('.menu-btn');
+  const side=document.querySelector('.side');
+  if(menu&&side){menu.addEventListener('click',()=>side.classList.toggle('open'));}
+  function onScroll(){
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    const p=max>0?(h.scrollTop/max)*100:0;
+    if(bar) bar.style.width=p+'%';
+    const heads=[...document.querySelectorAll('main h2[id], main h3[id]')];
+    let current='';
+    for(const el of heads){ if(el.getBoundingClientRect().top<=120) current=el.id; }
+    tocLinks.forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+current));
+  }
+  document.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+</script>
+
+</body>
+</html>

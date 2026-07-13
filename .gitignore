@@ -65,3 +65,7 @@ dist/
 
 # Logs
 *.log
+!.env.example
+.DS_Store
+.venv/
+__pycache__/

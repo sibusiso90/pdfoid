@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "architecture",
+  "title": "Architecture",
+  "status": "current",
+  "audience": [
+    "Document reviewers",
+    "Frontend developers",
+    "Contributors"
+  ],
+  "useWhen": "Use the corresponding current guide for this task.",
+  "sourceOfTruth": "current/architecture.md",
+  "counterparts": {
+    "markdown": "current/architecture.md",
+    "html": "current/architecture.html",
+    "json": "current/architecture.json"
+  },
+  "summary": "Current architecture guidance for PDFoid.",
+  "sections": [
+    {
+      "id": "purpose",
+      "label": "Purpose"
+    },
+    {
+      "id": "on-this-page",
+      "label": "On this page"
+    },
+    {
+      "id": "guidance",
+      "label": "Guidance"
+    },
+    {
+      "id": "verification",
+      "label": "Verification"
+    },
+    {
+      "id": "related-guides",
+      "label": "Related guides"
+    },
+    {
+      "id": "system-map",
+      "label": "System map"
+    },
+    {
+      "id": "ownership-boundaries",
+      "label": "Ownership boundaries"
+    },
+    {
+      "id": "safe-change-sequence",
+      "label": "Safe change sequence"
+    }
+  ],
+  "relatedGuides": [
+    "start-here",
+    "quality",
+    "contributing"
+  ],
+  "keywords": [
+    "pdfoid",
+    "architecture",
+    "documentation",
+    "current"
+  ],
+  "lastReviewed": "2026-07-13",
+  "sourceChecksum": "90036cddc07128ad3c1593593e7a2e68b1f8ab23c1dcf651b610404acb3e6c02",
+  "generatedAt": "2026-07-13T11:47:55.597820+00:00",
+  "release": "archive-2026-07-13",
+  "validation": {
+    "state": "generated"
+  }
+}

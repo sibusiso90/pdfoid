@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "State Management",
+  "group": "Project",
+  "path": ".docs/state-management.md",
+  "lead": "See also:",
+  "content_markdown": "# State Management (Zustand)\n\n## Stores\n- `annotationStore.ts`: drawing state + persistence + undo/redo\n- `pdfEditorStore.ts`: PDF bytes, manipulation operations, find/replace state\n- `uiStore.ts`: toasts, modals, preferences\n\n## Selector rules (prevents infinite loops)\n- If selecting multiple fields into an object, use `useShallow`.\n- Avoid calling functions inside selectors that read external mutable variables.\n- If UI needs to subscribe to a derived value, store it as state (e.g., stack lengths).\n\nSee also:\n- ADR: `adrs/ADR-002-zustand-selector-stability.md`\n- Runbook: `runbooks/debugging-react-zustand-loops.md`\n\n## Undo/Redo\n- Undo/redo history must be observable via store state when used for UI enable/disable.\n- Avoid keeping critical UI-driving values only in module-level closure variables.\n\n## Persistence\n- Keep persistence side-effects (IndexedDB reads/writes) out of selectors.\n- Prefer store actions that update state first, then persist (and surface errors via `uiStore` toasts).\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

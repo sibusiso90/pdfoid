@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<title>PDFoid · Improvements Summary</title>
+<style>:root{--canvas:#eef1f4;--canvas-2:#f7f9fb;--surface:#ffffff;--surface-2:#e5e9ee;--surface-3:#d7dde5;--border:rgba(15,23,42,.12);--border-strong:rgba(15,23,42,.2);--ink:#111827;--ink-2:#374151;--muted:#667085;--gold:#2457d6;--gold-2:#1d49b8;--gold-soft:rgba(36,87,214,.10);--azure:#2457d6;--live:#0f766e;--coral:#b91c1c;--warning:#b45309;--spine:linear-gradient(90deg,#2457d6,#38bdf8,#6366f1);--display:Georgia, 'Times New Roman', serif;--font:Arial, Helvetica, sans-serif;--mono:Consolas, monospace;--radius-sm:6px;--radius:10px;--radius-lg:14px;--shadow:0 18px 40px rgba(15,23,42,.08);--shadow-sm:0 2px 10px rgba(0,0,0,.12);--link:#2457d6;--sidebar-w:262px;--toc-w:212px;}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.68 var(--font);color:var(--ink-2);background:radial-gradient(1100px 620px at 8% -6%,rgba(36,87,214,.08),transparent 60%),radial-gradient(950px 520px at 104% 1%,rgba(99,102,241,.06),transparent 55%),var(--canvas);}a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}::selection{background:var(--gold-soft);color:var(--ink)}.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--spine);z-index:60;transition:width .1s linear}.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:13px 22px;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;text-decoration:none}.brand:hover{text-decoration:none}.mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);background:var(--gold-soft);border-radius:var(--radius-sm);font:800 11px/1 var(--mono);letter-spacing:.06em}.crumb{color:var(--muted);font-size:.86rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.crumb b{color:var(--ink-2);font-weight:700}.menu-btn{display:none;margin-left:auto;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:6px 11px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.shell{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr) var(--toc-w);gap:36px;max-width:1340px;margin:0 auto;padding:26px 26px 90px;align-items:start}.side{position:sticky;top:76px;max-height:calc(100vh - 98px);overflow-y:auto;padding-right:6px}.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px}.nav-group{margin-bottom:18px}.nav-h{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:7px;display:flex;align-items:center;gap:7px;font-family:var(--mono)}.side a{display:block;padding:6px 11px;border-radius:var(--radius-sm);color:var(--ink-2);font-size:.87rem;font-weight:500;line-height:1.35;border-left:2px solid transparent}.side a:hover{background:var(--surface-2);text-decoration:none;color:var(--ink)}.side a.on{background:var(--gold-soft);border-left-color:var(--gold);color:var(--gold-2)}main{min-width:0}.hero{margin-bottom:18px}.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border-strong);padding:5px 12px;border-radius:999px;font-family:var(--mono)}.hero h1{font-family:var(--display);font-size:2.6rem;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0;font-weight:400;color:var(--ink)}.hero .lead{color:var(--ink-2);font-size:1.05rem;max-width:70ch;margin:12px 0 0}.spine{height:3px;border-radius:999px;background:var(--spine);margin:20px 0 0}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px 30px}.card h2{font-family:var(--display);font-size:1.45rem;color:var(--ink);font-weight:400;margin:1.4em 0 .5em;padding-bottom:.35em;border-bottom:1px solid var(--border)}.card h2:first-child{margin-top:0}.card h3{font-size:1.02rem;color:var(--ink);margin:1.15em 0 .4em}.card p,.card li{color:var(--ink-2)}.card ul,.card ol{padding-left:1.2rem}.card li{margin:.35em 0}code,pre{font-family:var(--mono)}code{background:var(--gold-soft);padding:.12em .38em;border-radius:6px;font-size:.9em}pre{overflow:auto;background:var(--canvas-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;line-height:1.5}pre code{background:transparent;padding:0}.table-wrap{overflow:auto;margin:1rem 0}table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{border:1px solid var(--border);padding:8px 10px;text-align:left}th{background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}.toc{position:sticky;top:76px}.toc h4{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-family:var(--mono)}.toc a{display:block;padding:5px 0 5px 10px;border-left:2px solid var(--border);color:var(--muted);font-size:.82rem}.toc a:hover{color:var(--ink);text-decoration:none}.toc a.h3{padding-left:18px;font-size:.78rem}.toc a.on{border-left-color:var(--gold);color:var(--gold-2)}.related{margin-top:28px}.related h3{font-family:var(--display);font-size:1.35rem;color:var(--ink);font-weight:400;margin:0 0 12px}.rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.rel-card{display:block;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--ink-2)}.rel-card:hover{border-color:var(--border-strong);text-decoration:none;color:var(--ink);background:var(--surface)}.rel-card b{display:block;color:var(--ink);margin-bottom:4px}.rel-card span{font-size:.84rem;color:var(--muted)}.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}.pager a{display:block;min-width:180px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink-2)}.pager a:hover{border-color:var(--gold);text-decoration:none;color:var(--ink)}.pager .k{display:block;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.footer-note{margin-top:26px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:.84rem}.wrap{max-width:1140px;margin:0 auto;padding:14px 26px 90px}.hero-lg{padding:40px 0 6px}.hero-lg h1{font-family:var(--display);font-size:3.2rem;line-height:1.04;letter-spacing:-.01em;margin:10px 0 0;font-weight:400;color:var(--ink)}.hero-lg .tag{color:var(--ink-2);font-size:1.1rem;max-width:680px;margin-top:14px}.pill{display:inline-block;margin:18px 8px 0 0;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border-strong);color:var(--ink-2);font-size:.72rem;font-weight:600;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}.search{margin:24px 0 4px;width:100%;max-width:520px;padding:13px 16px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface);box-shadow:var(--shadow-sm);font:inherit;font-size:.95rem;color:var(--ink)}.search::placeholder{color:var(--muted)}.search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}.psec{margin-top:32px}.psec h2{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:1.5rem;color:var(--ink);font-weight:400;border-top:1px solid var(--border);padding-top:22px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}.gcard{display:block;padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink-2);min-height:120px}.gcard:hover{border-color:var(--border-strong);text-decoration:none;transform:translateY(-1px);color:var(--ink)}.gcard b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:6px}.gcard span{font-size:.9rem;color:var(--muted)}.gcard .grp{display:inline-block;margin-bottom:8px;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}@media (max-width:1100px){.shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr)}.toc{display:none}}@media (max-width:860px){.shell{grid-template-columns:1fr;padding:16px}.side{position:static;max-height:none;display:none}.side.open{display:block}.menu-btn{display:inline-block}.hero h1,.hero-lg h1{font-size:2.1rem}}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}</style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="topbar">
+  <a class="brand" href="index.html"><span class="mark">PDF</span>PDFoid docs</a>
+  <span class="crumb"><a href="index.html">Docs</a> / <b>Improvements Summary</b></span>
+  <button class="menu-btn" type="button">Menu</button>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Documentation"><div class="nav-group"><div class="nav-h">Guides</div><a href="architecture.html">Architecture</a><a href="catalog.html">Catalog</a><a href="design-system.html">Design System</a><a href="how-to-use.html">How To Use</a><a href="index.html">Index</a><a href="license.html">License</a><a href="roadmap.html">Roadmap</a><a href="security.html">Security</a><a href="skills.html">Skills</a><a href="../how-to-use.html">How To Use</a></div><div class="nav-group"><div class="nav-h">ADRs</div><a href="adr-0001-docs-system.html">Adr 0001 Docs System</a><a href="adr-0002-apache-2-0.html">Adr 0002 Apache 2 0</a><a href="adr-0003-package-manager-bun.html">Adr 0003 Package Manager Bun</a></div><div class="nav-group"><div class="nav-h">Project</div><a href="ARCHITECTURE_IMPROVEMENTS.html">Architecture Improvements</a><a href="AUDIT_IMPROVEMENTS_2026-07-10.html">Audit Improvements 2026 07 10</a><a href="COMPLETION_REPORT.html">Completion Report</a><a href="DEEPWIKI.html">Deepwiki</a><a href="DOCUMENTATION_INDEX.html">Documentation Index</a><a href="IMPLEMENTATION_SUMMARY.html">Implementation Summary</a><a class="on" href="IMPROVEMENTS_SUMMARY.html">Improvements Summary</a><a href="PHASE_1_IMPLEMENTATION.html">Phase 1 Implementation</a><a href="SECURITY_ISSUES_2026-07-10.html">Security Issues 2026 07 10</a><a href="TESTING_GUIDE.html">Testing Guide</a><a href="UPGRADE_COMPLETION_2026-07-10.html">Upgrade Completion 2026 07 10</a><a href="codebase-map.html">Codebase Map</a><a href="global_rules.html">Global Rules</a><a href="glossary.html">Glossary</a><a href="improved_dev_rules.html">Improved Dev Rules</a><a href="known-limitations.html">Known Limitations</a><a href="open-source-distribution.html">Open Source Distribution</a><a href="pdf-pipeline.html">Pdf Pipeline</a><a href="state-management.html">State Management</a></div></nav>
+  <main id="top">
+    <header class="hero">
+      <span class="eyebrow">Cold-neutral cobalt</span>
+      <h1>Improvements Summary</h1>
+      <p class="lead">This document summarizes the drastic improvements made to the PDFoid application following the Senior Developer &amp; Architect Guidelines from improveddevrules.md.</p>
+      <div class="spine"></div>
+    </header>
+    <article class="card">
+<h2 id="overview">Overview</h2>
+<p>This document summarizes the drastic improvements made to the PDFoid application following the Senior Developer &amp; Architect Guidelines from <code>improved_dev_rules.md</code>.</p>
+<p>---</p>
+<h2 id="1-type-safety-error-handling-src-types-common-ts">1. Type Safety &amp; Error Handling (<code>src/types/common.ts</code>)</h2>
+<h3 id="new-features">New Features</h3>
+<ul>
+<li><strong>Result Type Pattern</strong>: Implemented <code>Result&lt;T, E&gt;</code> type for handling success/failure without exceptions</li>
+<li><strong>App Error System</strong>: Centralized error handling with <code>AppError</code> interface and error codes</li>
+<li><strong>Geometry Types</strong>: Consistent <code>Point</code>, <code>Size</code>, <code>Rect</code>, and normalized versions</li>
+<li><strong>Brand Types</strong>: TypeScript branded types for <code>PageNumber</code> and <code>AnnotationId</code></li>
+<li><strong>Type Guards</strong>: <code>isDefined</code>, <code>isNonEmptyString</code> for safer type narrowing</li>
+<li><strong>Utility Functions</strong>: </li>
+</ul>
+<p>  - <code>clamp</code>, <code>clamp01</code> for value clamping</p>
+<p>  - <code>debounce</code>, <code>throttle</code> with proper typing</p>
+<p>  - <code>generateId</code> for unique IDs</p>
+<p>  - <code>safeJsonParse</code> for type-safe JSON parsing</p>
+<p>---</p>
+<h2 id="2-centralized-constants-src-constants-index-ts">2. Centralized Constants (<code>src/constants/index.ts</code>)</h2>
+<h3 id="purpose">Purpose</h3>
+<p>Single source of truth for all magic numbers and configuration values.</p>
+<h3 id="categories">Categories</h3>
+<ul>
+<li><strong>PDF_CONFIG</strong>: Scale limits, worker URL</li>
+<li><strong>ANNOTATION_DEFAULTS</strong>: Colors, stroke widths, opacity, font sizes</li>
+<li><strong>STICKY_NOTE</strong>: Dimensions and colors</li>
+<li><strong>HIGHLIGHT_COLORS</strong>: Preset highlight colors</li>
+<li><strong>PRESET_COLORS</strong>: Tool color palette</li>
+<li><strong>STORAGE_CONFIG</strong>: IndexedDB configuration</li>
+<li><strong>UI_CONFIG</strong>: Layout dimensions</li>
+<li><strong>PERFORMANCE_BUDGET</strong>: Warning thresholds</li>
+<li><strong>A11Y</strong>: Accessibility constants</li>
+<li><strong>KEYBOARD_SHORTCUTS</strong>: Shortcut key mappings</li>
+<li><strong>FILE_CONSTRAINTS</strong>: Upload limits</li>
+<li><strong>AI_CONFIG</strong>: NLP configuration</li>
+</ul>
+<p>---</p>
+<h2 id="3-reusable-ui-components-src-components-ui-index-tsx">3. Reusable UI Components (<code>src/components/ui/index.tsx</code>)</h2>
+<h3 id="components">Components</h3>
+<ul>
+<li><strong>Button</strong>: Accessible button with variants (primary, secondary, danger, ghost, link)</li>
+<li><strong>IconButton</strong>: Icon-only button with required ARIA label</li>
+<li><strong>Spinner</strong>: Loading indicator with size variants</li>
+<li><strong>Slider</strong>: Range input with accessibility attributes</li>
+<li><strong>Divider</strong>: Visual separator</li>
+<li><strong>Badge</strong>: Status/count indicators</li>
+<li><strong>Toast</strong>: Notification component with ARIA roles</li>
+<li><strong>SkipLink</strong>: Skip to main content for keyboard navigation</li>
+<li><strong>VisuallyHidden</strong>: Screen reader only content</li>
+<li><strong>Card</strong>: Container component</li>
+<li><strong>EmptyState</strong>: Empty content placeholder</li>
+<li><strong>Skeleton</strong>: Loading skeleton for content</li>
+</ul>
+<p>---</p>
+<h2 id="4-custom-react-hooks-src-hooks-index-ts">4. Custom React Hooks (<code>src/hooks/index.ts</code>)</h2>
+<h3 id="hooks">Hooks</h3>
+<ul>
+<li><strong>useKeyboardShortcut</strong>: Declarative keyboard shortcut handling</li>
+<li><strong>useDebounce</strong>: Debounced value</li>
+<li><strong>useDebouncedCallback</strong>: Debounced function</li>
+<li><strong>useThrottledCallback</strong>: Throttled function</li>
+<li><strong>usePrevious</strong>: Access previous value</li>
+<li><strong>useLocalStorage</strong>: Type-safe localStorage</li>
+<li><strong>useMediaQuery</strong>: Responsive design</li>
+<li><strong>useIsMobile/useIsTablet/useIsDesktop</strong>: Breakpoint hooks</li>
+<li><strong>useElementSize</strong>: Track element dimensions</li>
+<li><strong>useClickOutside</strong>: Detect clicks outside element</li>
+<li><strong>useFocusTrap</strong>: Trap focus within element</li>
+<li><strong>useAsync</strong>: Async operation state management</li>
+<li><strong>useIsMounted</strong>: Prevent updates on unmounted components</li>
+<li><strong>useDocumentTitle</strong>: Dynamic document title</li>
+</ul>
+<p>---</p>
+<h2 id="5-accessibility-improvements-wcag-compliance">5. Accessibility Improvements (WCAG Compliance)</h2>
+<h3 id="components-updated">Components Updated</h3>
+<p>#### VerticalToolbar</p>
+<ul>
+<li>Added <code>role="toolbar"</code> with <code>aria-label</code></li>
+<li>Keyboard navigation with arrow keys</li>
+<li><code>aria-pressed</code> for selected state</li>
+<li><code>aria-keyshortcuts</code> for shortcut hints</li>
+<li>Focus management with <code>tabIndex</code></li>
+</ul>
+<p>#### PDFViewer</p>
+<ul>
+<li><code>role="region"</code> and <code>role="document"</code></li>
+<li><code>aria-label</code> on all interactive elements</li>
+<li><code>aria-live</code> regions for dynamic content</li>
+<li><code>aria-pressed</code> for toggle buttons</li>
+<li>Direct page input with proper labels</li>
+<li>Error alerts with <code>role="alert"</code></li>
+</ul>
+<p>#### PDFUploader</p>
+<ul>
+<li>Drag and drop with visual feedback</li>
+<li>Progress bar with <code>role="progressbar"</code></li>
+<li>Error states with <code>role="alert"</code></li>
+<li>File input with <code>aria-describedby</code></li>
+<li>Screen reader descriptions</li>
+</ul>
+<p>#### ToolSettingsPanel</p>
+<ul>
+<li>Color picker with <code>role="radiogroup"</code></li>
+<li>Slider components with ARIA attributes</li>
+<li>Button groups with proper roles</li>
+<li>Save feedback with loading states</li>
+</ul>
+<p>#### App.tsx</p>
+<ul>
+<li>Skip link for keyboard navigation</li>
+<li>Dynamic document title</li>
+<li>Semantic HTML structure</li>
+<li>Proper ARIA landmarks</li>
+</ul>
+<p>---</p>
+<h2 id="6-error-boundary-src-components-errorboundary-tsx">6. Error Boundary (<code>src/components/ErrorBoundary.tsx</code>)</h2>
+<h3 id="features">Features</h3>
+<ul>
+<li>Catches JavaScript errors in component tree</li>
+<li>User-friendly error message</li>
+<li>Error details expandable section</li>
+<li>"Try Again" and "Refresh Page" actions</li>
+<li>Higher-order component wrapper</li>
+</ul>
+<p>---</p>
+<h2 id="7-performance-utilities-src-utils-performance-ts">7. Performance Utilities (<code>src/utils/performance.ts</code>)</h2>
+<h3 id="features">Features</h3>
+<ul>
+<li><strong>memoize</strong>: Simple memoization</li>
+<li><strong>LRUCache</strong>: Bounded cache for memory management</li>
+<li><strong>batchUpdates</strong>: RAF-based DOM updates</li>
+<li><strong>scheduleIdleWork</strong>: Non-urgent work scheduling</li>
+<li><strong>measurePerformance</strong>: Performance timing helpers</li>
+<li><strong>isLowMemory/getAvailableMemory</strong>: Memory detection</li>
+<li><strong>prefersReducedMotion/prefersDarkMode</strong>: User preferences</li>
+<li><strong>observeIntersection</strong>: Lazy loading helper</li>
+<li><strong>animateValue</strong>: Smooth value interpolation</li>
+<li><strong>easings</strong>: Common easing functions</li>
+</ul>
+<p>---</p>
+<h2 id="8-build-optimization">8. Build Optimization</h2>
+<h3 id="vite-configuration">Vite Configuration</h3>
+<ul>
+<li>Manual chunk splitting for:</li>
+</ul>
+<p>  - pdf-lib</p>
+<p>  - pdfjs-dist</p>
+<p>  - React vendor</p>
+<p>  - Zustand</p>
+<ul>
+<li>Better caching with separate vendor bundles</li>
+<li>Reduced initial load time</li>
+</ul>
+<p>---</p>
+<h2 id="9-store-improvements">9. Store Improvements</h2>
+<h3 id="annotation-store">Annotation Store</h3>
+<ul>
+<li>Removed lodash.debounce dependency (custom implementation)</li>
+<li>Uses centralized constants</li>
+<li>Improved type annotations</li>
+</ul>
+<p>---</p>
+<h2 id="code-quality-improvements">Code Quality Improvements</h2>
+<h3 id="following-guidelines">Following Guidelines</h3>
+<p>1. <strong>Problem Decomposition</strong>: Analyzed each component's responsibilities</p>
+<p>2. <strong>DRY Principle</strong>: Created reusable UI components and hooks</p>
+<p>3. <strong>Single Responsibility</strong>: Separated concerns into modules</p>
+<p>4. <strong>Accessibility First</strong>: All interactive elements accessible</p>
+<p>5. <strong>Error Handling</strong>: Comprehensive error boundaries</p>
+<p>6. <strong>Performance</strong>: Memoization and optimization utilities</p>
+<p>7. <strong>Type Safety</strong>: Strong typing throughout</p>
+<p>8. <strong>Documentation</strong>: Clear comments and JSDoc</p>
+<h3 id="file-organization">File Organization</h3>
+<pre><code>
+src/
+├── components/
+│   ├── ui/                    # Reusable UI components
+│   │   └── index.tsx
+│   └── ErrorBoundary.tsx      # Error boundary
+├── constants/
+│   └── index.ts               # Centralized constants
+├── hooks/
+│   └── index.ts               # Custom React hooks
+├── types/
+│   ├── annotations.ts         # Existing
+│   └── common.ts              # New common types
+└── utils/
+    ├── ai.ts                  # Existing
+    └── performance.ts         # New performance utilities
+</code></pre>
+<p>---</p>
+<h2 id="testing-checklist">Testing Checklist</h2>
+<ul>
+<li>[x] Build succeeds without errors</li>
+<li>[x] No TypeScript errors</li>
+<li>[x] All components have proper ARIA attributes</li>
+<li>[x] Keyboard navigation works</li>
+<li>[x] Error boundaries catch errors gracefully</li>
+<li>[x] Constants are used consistently</li>
+</ul>
+<p>---</p>
+<h2 id="future-recommendations">Future Recommendations</h2>
+<p>1. <strong>Add Unit Tests</strong>: Use the testing infrastructure mentioned in guidelines</p>
+<p>2. <strong>Performance Monitoring</strong>: Implement the performance budget tracking</p>
+<p>3. <strong>Dark Mode</strong>: Use <code>prefersDarkMode</code> utility</p>
+<p>4. <strong>Reduced Motion</strong>: Respect <code>prefersReducedMotion</code> preference</p>
+<p>5. <strong>Error Tracking</strong>: Connect error boundary to logging service</p>
+<p>6. <strong>Bundle Analysis</strong>: Regular bundle size audits</p>
+    </article>
+    <div class="related"><h3>Related pages</h3><div class="rel-grid"><a class="rel-card" href="ARCHITECTURE_IMPROVEMENTS.html"><b>Architecture Improvements</b><span>This implementation improves Phase 1 stability and visual accuracy by fixing fundamental issues in the canvas rendering pipeline and toolbar layout. All changes align with globalru</span></a><a class="rel-card" href="AUDIT_IMPROVEMENTS_2026-07-10.html"><b>Audit Improvements 2026 07 10</b><span>Product: PDFoid</span></a><a class="rel-card" href="COMPLETION_REPORT.html"><b>Completion Report</b><span>Date: October 29, 2025</span></a><a class="rel-card" href="DEEPWIKI.html"><b>Deepwiki</b><span>Primary Objective: Build a high-quality, AI-assisted PDF editor with built-in local AI capabilities.</span></a></div></div>
+    <div class="pager"><a href="IMPLEMENTATION_SUMMARY.html"><span class="k">Previous</span>Implementation Summary</a><a href="PHASE_1_IMPLEMENTATION.html"><span class="k">Next</span>Phase 1 Implementation</a></div>
+    <div class="footer-note">PDFoid · Quantumide-style ultra-linked docs · Apache-2.0 · Lehro Solutions</div>
+  </main>
+  <div class="toc"><h4>On this page</h4><a href="#top">Overview</a></div>
+</div>
+
+<script>
+(function(){
+  const bar=document.querySelector('.progress');
+  const tocLinks=[...document.querySelectorAll('.toc a')];
+  const menu=document.querySelector('.menu-btn');
+  const side=document.querySelector('.side');
+  if(menu&&side){menu.addEventListener('click',()=>side.classList.toggle('open'));}
+  function onScroll(){
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    const p=max>0?(h.scrollTop/max)*100:0;
+    if(bar) bar.style.width=p+'%';
+    const heads=[...document.querySelectorAll('main h2[id], main h3[id]')];
+    let current='';
+    for(const el of heads){ if(el.getBoundingClientRect().top<=120) current=el.id; }
+    tocLinks.forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+current));
+  }
+  document.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+</script>
+
+</body>
+</html>

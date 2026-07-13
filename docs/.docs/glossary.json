@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Glossary",
+  "group": "Project",
+  "path": ".docs/glossary.md",
+  "lead": "",
+  "content_markdown": "# Glossary\n\n- **pdf.js**: Browser PDF renderer/parser used here for text extraction and page rendering.\n- **pdf-lib**: Library used here to generate/modify PDFs (drawing, embedding fonts, adding overlays).\n- **Content stream**: The PDF instruction sequence that draws text/paths/images on a page.\n- **Text matrix / transform**: Affine transform describing how text is positioned/scaled/rotated in PDF coordinates.\n- **Overlay replacement**: Redaction-style approach: erase region + draw new text on top.\n- **True text editing**: Editing existing content stream text operators and resources rather than drawing new content.\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

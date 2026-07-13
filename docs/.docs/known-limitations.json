@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Known Limitations",
+  "group": "Project",
+  "path": ".docs/known-limitations.md",
+  "lead": "",
+  "content_markdown": "# Known Limitations\n\n## Find & Replace (PDF text editing)\n- Current implementation uses overlay replacement (white rectangle + new text).\n- It cannot guarantee perfect visual parity with the original font/kerning.\n- Rotated/skewed text and glyph-by-glyph layouts may be skipped for safety.\n\n## Worker hosting\n- PDF.js worker is currently referenced via CDN. For production-grade reliability, consider self-hosting a pinned worker asset.\n\n## Scanned PDFs\n- Scanned/image-only PDFs have no selectable text; search/replace requires OCR (future work).\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

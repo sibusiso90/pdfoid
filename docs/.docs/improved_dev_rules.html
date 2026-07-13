@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="light"/>
+<title>PDFoid · Improved Dev Rules</title>
+<style>:root{--canvas:#eef1f4;--canvas-2:#f7f9fb;--surface:#ffffff;--surface-2:#e5e9ee;--surface-3:#d7dde5;--border:rgba(15,23,42,.12);--border-strong:rgba(15,23,42,.2);--ink:#111827;--ink-2:#374151;--muted:#667085;--gold:#2457d6;--gold-2:#1d49b8;--gold-soft:rgba(36,87,214,.10);--azure:#2457d6;--live:#0f766e;--coral:#b91c1c;--warning:#b45309;--spine:linear-gradient(90deg,#2457d6,#38bdf8,#6366f1);--display:Georgia, 'Times New Roman', serif;--font:Arial, Helvetica, sans-serif;--mono:Consolas, monospace;--radius-sm:6px;--radius:10px;--radius-lg:14px;--shadow:0 18px 40px rgba(15,23,42,.08);--shadow-sm:0 2px 10px rgba(0,0,0,.12);--link:#2457d6;--sidebar-w:262px;--toc-w:212px;}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.68 var(--font);color:var(--ink-2);background:radial-gradient(1100px 620px at 8% -6%,rgba(36,87,214,.08),transparent 60%),radial-gradient(950px 520px at 104% 1%,rgba(99,102,241,.06),transparent 55%),var(--canvas);}a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}::selection{background:var(--gold-soft);color:var(--ink)}.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--spine);z-index:60;transition:width .1s linear}.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:13px 22px;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;text-decoration:none}.brand:hover{text-decoration:none}.mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);background:var(--gold-soft);border-radius:var(--radius-sm);font:800 11px/1 var(--mono);letter-spacing:.06em}.crumb{color:var(--muted);font-size:.86rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.crumb b{color:var(--ink-2);font-weight:700}.menu-btn{display:none;margin-left:auto;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);padding:6px 11px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.shell{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr) var(--toc-w);gap:36px;max-width:1340px;margin:0 auto;padding:26px 26px 90px;align-items:start}.side{position:sticky;top:76px;max-height:calc(100vh - 98px);overflow-y:auto;padding-right:6px}.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:8px}.nav-group{margin-bottom:18px}.nav-h{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:7px;display:flex;align-items:center;gap:7px;font-family:var(--mono)}.side a{display:block;padding:6px 11px;border-radius:var(--radius-sm);color:var(--ink-2);font-size:.87rem;font-weight:500;line-height:1.35;border-left:2px solid transparent}.side a:hover{background:var(--surface-2);text-decoration:none;color:var(--ink)}.side a.on{background:var(--gold-soft);border-left-color:var(--gold);color:var(--gold-2)}main{min-width:0}.hero{margin-bottom:18px}.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border-strong);padding:5px 12px;border-radius:999px;font-family:var(--mono)}.hero h1{font-family:var(--display);font-size:2.6rem;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0;font-weight:400;color:var(--ink)}.hero .lead{color:var(--ink-2);font-size:1.05rem;max-width:70ch;margin:12px 0 0}.spine{height:3px;border-radius:999px;background:var(--spine);margin:20px 0 0}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px 30px}.card h2{font-family:var(--display);font-size:1.45rem;color:var(--ink);font-weight:400;margin:1.4em 0 .5em;padding-bottom:.35em;border-bottom:1px solid var(--border)}.card h2:first-child{margin-top:0}.card h3{font-size:1.02rem;color:var(--ink);margin:1.15em 0 .4em}.card p,.card li{color:var(--ink-2)}.card ul,.card ol{padding-left:1.2rem}.card li{margin:.35em 0}code,pre{font-family:var(--mono)}code{background:var(--gold-soft);padding:.12em .38em;border-radius:6px;font-size:.9em}pre{overflow:auto;background:var(--canvas-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;line-height:1.5}pre code{background:transparent;padding:0}.table-wrap{overflow:auto;margin:1rem 0}table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{border:1px solid var(--border);padding:8px 10px;text-align:left}th{background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}.toc{position:sticky;top:76px}.toc h4{font-size:.64rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-family:var(--mono)}.toc a{display:block;padding:5px 0 5px 10px;border-left:2px solid var(--border);color:var(--muted);font-size:.82rem}.toc a:hover{color:var(--ink);text-decoration:none}.toc a.h3{padding-left:18px;font-size:.78rem}.toc a.on{border-left-color:var(--gold);color:var(--gold-2)}.related{margin-top:28px}.related h3{font-family:var(--display);font-size:1.35rem;color:var(--ink);font-weight:400;margin:0 0 12px}.rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.rel-card{display:block;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--ink-2)}.rel-card:hover{border-color:var(--border-strong);text-decoration:none;color:var(--ink);background:var(--surface)}.rel-card b{display:block;color:var(--ink);margin-bottom:4px}.rel-card span{font-size:.84rem;color:var(--muted)}.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}.pager a{display:block;min-width:180px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink-2)}.pager a:hover{border-color:var(--gold);text-decoration:none;color:var(--ink)}.pager .k{display:block;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.footer-note{margin-top:26px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:.84rem}.wrap{max-width:1140px;margin:0 auto;padding:14px 26px 90px}.hero-lg{padding:40px 0 6px}.hero-lg h1{font-family:var(--display);font-size:3.2rem;line-height:1.04;letter-spacing:-.01em;margin:10px 0 0;font-weight:400;color:var(--ink)}.hero-lg .tag{color:var(--ink-2);font-size:1.1rem;max-width:680px;margin-top:14px}.pill{display:inline-block;margin:18px 8px 0 0;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border-strong);color:var(--ink-2);font-size:.72rem;font-weight:600;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}.search{margin:24px 0 4px;width:100%;max-width:520px;padding:13px 16px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface);box-shadow:var(--shadow-sm);font:inherit;font-size:.95rem;color:var(--ink)}.search::placeholder{color:var(--muted)}.search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}.psec{margin-top:32px}.psec h2{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:1.5rem;color:var(--ink);font-weight:400;border-top:1px solid var(--border);padding-top:22px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}.gcard{display:block;padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink-2);min-height:120px}.gcard:hover{border-color:var(--border-strong);text-decoration:none;transform:translateY(-1px);color:var(--ink)}.gcard b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:6px}.gcard span{font-size:.9rem;color:var(--muted)}.gcard .grp{display:inline-block;margin-bottom:8px;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}@media (max-width:1100px){.shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr)}.toc{display:none}}@media (max-width:860px){.shell{grid-template-columns:1fr;padding:16px}.side{position:static;max-height:none;display:none}.side.open{display:block}.menu-btn{display:inline-block}.hero h1,.hero-lg h1{font-size:2.1rem}}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}</style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="topbar">
+  <a class="brand" href="index.html"><span class="mark">PDF</span>PDFoid docs</a>
+  <span class="crumb"><a href="index.html">Docs</a> / <b>Improved Dev Rules</b></span>
+  <button class="menu-btn" type="button">Menu</button>
+</div>
+<div class="shell">
+  <nav class="side" aria-label="Documentation"><div class="nav-group"><div class="nav-h">Guides</div><a href="architecture.html">Architecture</a><a href="catalog.html">Catalog</a><a href="design-system.html">Design System</a><a href="how-to-use.html">How To Use</a><a href="index.html">Index</a><a href="license.html">License</a><a href="roadmap.html">Roadmap</a><a href="security.html">Security</a><a href="skills.html">Skills</a><a href="../how-to-use.html">How To Use</a></div><div class="nav-group"><div class="nav-h">ADRs</div><a href="adr-0001-docs-system.html">Adr 0001 Docs System</a><a href="adr-0002-apache-2-0.html">Adr 0002 Apache 2 0</a><a href="adr-0003-package-manager-bun.html">Adr 0003 Package Manager Bun</a></div><div class="nav-group"><div class="nav-h">Project</div><a href="ARCHITECTURE_IMPROVEMENTS.html">Architecture Improvements</a><a href="AUDIT_IMPROVEMENTS_2026-07-10.html">Audit Improvements 2026 07 10</a><a href="COMPLETION_REPORT.html">Completion Report</a><a href="DEEPWIKI.html">Deepwiki</a><a href="DOCUMENTATION_INDEX.html">Documentation Index</a><a href="IMPLEMENTATION_SUMMARY.html">Implementation Summary</a><a href="IMPROVEMENTS_SUMMARY.html">Improvements Summary</a><a href="PHASE_1_IMPLEMENTATION.html">Phase 1 Implementation</a><a href="SECURITY_ISSUES_2026-07-10.html">Security Issues 2026 07 10</a><a href="TESTING_GUIDE.html">Testing Guide</a><a href="UPGRADE_COMPLETION_2026-07-10.html">Upgrade Completion 2026 07 10</a><a href="codebase-map.html">Codebase Map</a><a href="global_rules.html">Global Rules</a><a href="glossary.html">Glossary</a><a class="on" href="improved_dev_rules.html">Improved Dev Rules</a><a href="known-limitations.html">Known Limitations</a><a href="open-source-distribution.html">Open Source Distribution</a><a href="pdf-pipeline.html">Pdf Pipeline</a><a href="state-management.html">State Management</a></div></nav>
+  <main id="top">
+    <header class="hero">
+      <span class="eyebrow">Cold-neutral cobalt</span>
+      <h1>Improved Dev Rules</h1>
+      <p class="lead">Core Philosophy: Every decision, every line of code, every design choice must be justified through rigorous analysis. You are not just writing code—you are solving problems, managi</p>
+      <div class="spine"></div>
+    </header>
+    <article class="card">
+<h2 id="meta-principle-critical-thinking-as-foundation">Meta-Principle: Critical Thinking as Foundation</h2>
+<p><strong>Core Philosophy</strong>: Every decision, every line of code, every design choice must be justified through rigorous analysis. You are not just writing code—you are solving problems, managing complexity, and building systems that others will maintain.</p>
+<p>---</p>
+<h2 id="section-1-analytical-mindset">Section 1: Analytical Mindset</h2>
+<h3 id="before-writing-any-code">Before Writing Any Code</h3>
+<p><strong>STOP. THINK. ANALYZE.</strong></p>
+<p>1. <strong>Problem Decomposition</strong></p>
+<p>   - What is the <em>actual</em> problem vs. the stated problem?</p>
+<p>   - What are we optimizing for? (Speed? Maintainability? Cost? User experience?)</p>
+<p>   - What are the constraints? (Technical debt, legacy systems, team skills, budget, timeline)</p>
+<p>   - What are the second-order effects of this solution?</p>
+<p>2. <strong>Challenge Your Assumptions</strong></p>
+<p>   - "The user wants X" → Have we validated this with data or feedback?</p>
+<p>   - "This framework is best" → Best for what specific criteria?</p>
+<p>   - "We've always done it this way" → Is there a better way now?</p>
+<p>   - "This is simple" → Simple for whom? (Developer? User? DevOps?)</p>
+<p>3. <strong>Code Archaeology</strong></p>
+<p>   ```</p>
+<p>   When touching existing code:</p>
+<p>   - Read the surrounding context (not just the function)</p>
+<p>   - Check git history/blame to understand why it exists</p>
+<p>   - Look for related tests that reveal intent</p>
+<p>   - Search for dependent code that might break</p>
+<p>   - Understand the problem it originally solved</p>
+<p>   ```</p>
+<p>4. <strong>Justified Decision-Making</strong></p>
+<p>   Every significant choice should answer:</p>
+<p>   - <strong>Why this approach?</strong> (What alternatives did you consider?)</p>
+<p>   - <strong>What are the trade-offs?</strong> (What are we giving up?)</p>
+<p>   - <strong>How will this age?</strong> (Maintenance burden in 2 years?)</p>
+<p>   - <strong>Can you defend this in code review?</strong> (Explain it clearly)</p>
+<p>---</p>
+<h2 id="section-2-project-lifecycle-excellence">Section 2: Project Lifecycle Excellence</h2>
+<h3 id="phase-1-requirements-planning-the-deep-wiki">Phase 1: Requirements &amp; Planning (The Deep Wiki)</h3>
+<p><strong>Create a living document that captures:</strong></p>
+<pre><code class="language-markdown">
+# Project Deep Wiki Template
+
+## Problem Statement
+- Business problem (in stakeholder language)
+- Technical problem (in engineering language)
+- Success metrics (quantifiable)
+
+## Context &amp; Constraints
+- Existing architecture/systems to integrate with
+- Performance requirements (with numbers)
+- Security/compliance requirements
+- Budget/timeline/resource constraints
+- Team expertise/learning curves
+
+## Architecture Decision Records (ADRs)
+For each major decision, document:
+
+### ADR-001: [Decision Title]
+**Status**: Proposed | Accepted | Deprecated
+**Context**: What forces are at play?
+**Decision**: What are we doing?
+**Consequences**: What becomes easier/harder?
+**Alternatives Considered**: What else did we evaluate?
+
+## Tech Stack Justification
+| Component | Choice | Why Not Alternative? | Risk/Mitigation |
+|-----------|--------|---------------------|-----------------|
+| Frontend  | React  | Vue: smaller team   | Learning curve: invest in training |
+| Database  | Postgres | NoSQL: need ACID  | Scale limit: plan sharding at 10M rows |
+
+## Non-Functional Requirements
+- Performance: 95th percentile response &lt; 200ms
+- Availability: 99.9% uptime (43min downtime/month acceptable)
+- Scalability: Handle 10x current load without rewrite
+- Security: OWASP Top 10 mitigation, SOC2 compliance
+
+## Testing Strategy
+- Unit: 80% coverage on business logic
+- Integration: All API endpoints
+- E2E: Critical user journeys (checkout, signup)
+- Performance: Load test at 2x expected peak
+- Security: Quarterly pen tests
+
+## Rollout Plan
+- Phase 1: Internal alpha (1 week)
+- Phase 2: Beta with 10% users (2 weeks)
+- Phase 3: Full rollout with kill switch
+- Rollback criteria: Error rate &gt; 1%, latency &gt; 500ms
+</code></pre>
+<h3 id="phase-2-implementation">Phase 2: Implementation</h3>
+<p><strong>The Progressive Development Loop:</strong></p>
+<pre><code>
+1. Write minimal viable code (make it work)
+   ↓
+2. Add tests for critical paths (make it reliable)
+   ↓
+3. Refactor for clarity (make it right)
+   ↓
+4. Profile and optimize hotspots (make it fast)
+   ↓
+5. Document complex decisions (make it maintainable)
+   ↓
+6. Repeat for next feature
+</code></pre>
+<p><strong>Critical: Don't skip steps or combine them prematurely.</strong></p>
+<h3 id="phase-3-code-review-protocol">Phase 3: Code Review Protocol</h3>
+<p><strong>Self-Review Checklist (before requesting review):</strong></p>
+<pre><code class="language-yaml">
+Functionality:
+  - [ ] Solves the stated problem completely
+  - [ ] Handles edge cases (null, empty, max values)
+  - [ ] Error messages are actionable for users
+  - [ ] Degrades gracefully under failure
+
+Code Quality:
+  - [ ] No duplication (DRY applied thoughtfully)
+  - [ ] Functions do one thing (SRP)
+  - [ ] Names reveal intent (no comments needed for "what")
+  - [ ] Cyclomatic complexity &lt; 10 per function
+  - [ ] No magic numbers (use named constants)
+
+Testing:
+  - [ ] Tests cover happy path + 3 edge cases minimum
+  - [ ] Tests are deterministic (no random/time dependencies)
+  - [ ] Test names describe behavior, not implementation
+  - [ ] Mocks are used sparingly (prefer real objects)
+
+Security:
+  - [ ] Input validation on all external data
+  - [ ] SQL injection prevention (parameterized queries)
+  - [ ] XSS prevention (output encoding)
+  - [ ] Secrets in environment variables, not code
+  - [ ] Authentication/authorization checks in place
+  - [ ] HTTPS enforced for sensitive data
+
+Performance:
+  - [ ] No N+1 queries
+  - [ ] Database queries use indexes
+  - [ ] Large operations are paginated
+  - [ ] Caching applied where appropriate
+  - [ ] No synchronous I/O in request handlers
+
+Observability:
+  - [ ] Structured logging at appropriate levels
+  - [ ] Metrics for business and technical KPIs
+  - [ ] Distributed tracing IDs propagated
+  - [ ] Error tracking with context
+
+Documentation:
+  - [ ] README updated if public API changed
+  - [ ] Complex algorithms have "why" comments
+  - [ ] API endpoints documented (OpenAPI/Swagger)
+  - [ ] Migration path documented for breaking changes
+</code></pre>
+<p>---</p>
+<h2 id="section-3-command-execution-discipline">Section 3: Command Execution Discipline</h2>
+<h3 id="terminal-workflow-protocol">Terminal Workflow Protocol</h3>
+<pre><code class="language-bash">
+# WRONG: Fire and forget
+$ npm install &amp;&amp; npm build &amp;&amp; npm test &amp;&amp; npm deploy
+
+# RIGHT: Sequential with verification
+$ npm install
+# READ OUTPUT: Check for vulnerabilities, deprecated warnings
+# VERIFY: node_modules exists, package-lock updated
+
+$ npm run build
+# READ OUTPUT: Any TypeScript errors? Bundle size acceptable?
+# VERIFY: dist/ folder created, files not empty
+
+$ npm test
+# READ OUTPUT: All tests pass? Any warnings? Coverage adequate?
+# VERIFY: No flaky tests, coverage report generated
+
+$ npm run deploy
+# READ OUTPUT: Deployment successful? Health checks passing?
+# VERIFY: New version live, rollback plan ready
+</code></pre>
+<p><strong>Key Principles:</strong></p>
+<p>1. <strong>One command at a time</strong> - See what breaks before cascading failures</p>
+<p>2. <strong>Read every line of output</strong> - Warnings today are errors tomorrow</p>
+<p>3. <strong>Verify state changes</strong> - Don't trust, verify (ls, git status, curl)</p>
+<p>4. <strong>Document surprises</strong> - Unexpected output = learning opportunity</p>
+<p>---</p>
+<h2 id="section-4-ui-ux-engineering-excellence">Section 4: UI/UX Engineering Excellence</h2>
+<h3 id="design-system-thinking">Design System Thinking</h3>
+<p><strong>Don't just design screens—design systems that scale.</strong></p>
+<pre><code>
+Atomic Design Methodology:
+├── Atoms (Button, Input, Label)
+├── Molecules (SearchBar = Input + Button)
+├── Organisms (Header = Logo + Nav + SearchBar)
+├── Templates (PageLayout with slots)
+└── Pages (Specific template instances)
+</code></pre>
+<h3 id="accessibility-first-development">Accessibility-First Development</h3>
+<p><strong>Not a feature. Not optional. It's fundamental engineering.</strong></p>
+<pre><code class="language-typescript">
+// WRONG: Div soup
+&lt;div onClick={handleClick}&gt;Click me&lt;/div&gt;
+
+// RIGHT: Semantic HTML
+&lt;button 
+  onClick={handleClick}
+  aria-label="Add item to cart"
+  disabled={loading}
+&gt;
+  {loading ? &lt;Spinner aria-live="polite" /&gt; : 'Add to Cart'}
+&lt;/button&gt;
+</code></pre>
+<p><strong>Non-Negotiable Standards:</strong></p>
+<ul>
+<li>✅ All interactive elements keyboard accessible (Tab, Enter, Space, Escape)</li>
+<li>✅ Screen reader announces all state changes (aria-live, role, aria-label)</li>
+<li>✅ Color contrast ≥ 4.5:1 for text, ≥ 3:1 for UI components</li>
+<li>✅ Focus indicators clearly visible (outline ≥ 2px, high contrast)</li>
+<li>✅ Form fields have associated labels (not just placeholders)</li>
+<li>✅ Error messages associated with fields (aria-describedby)</li>
+<li>✅ Skip navigation links for keyboard users</li>
+<li>✅ Responsive text (no fixed pixel sizes, use rem/em)</li>
+<li>✅ Alt text for images (descriptive, not decorative spam)</li>
+</ul>
+<h3 id="responsive-design-strategy">Responsive Design Strategy</h3>
+<pre><code class="language-scss">
+// Mobile-first approach
+.component {
+  // Base styles (mobile)
+  font-size: 1rem;
+  padding: 1rem;
+
+  // Tablet
+  @media (min-width: 768px) {
+    font-size: 1.125rem;
+    padding: 1.5rem;
+  }
+
+  // Desktop
+  @media (min-width: 1024px) {
+    font-size: 1.25rem;
+    padding: 2rem;
+  }
+}
+</code></pre>
+<p><strong>Breakpoint Strategy:</strong></p>
+<ul>
+<li>0-639px: Mobile (1 column, touch targets ≥ 44px)</li>
+<li>640-1023px: Tablet (2 columns, hybrid input)</li>
+<li>1024+px: Desktop (3+ columns, mouse/keyboard)</li>
+</ul>
+<h3 id="performance-budget">Performance Budget</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Metric</th><th>Target</th><th>Maximum</th><th>Justification</th></tr></thead><tbody>
+<tr><td>First Contentful Paint</td><td>1.0s</td><td>1.8s</td><td>User perceives as "instant"</td></tr>
+<tr><td>Largest Contentful Paint</td><td>1.5s</td><td>2.5s</td><td>Main content visible</td></tr>
+<tr><td>Time to Interactive</td><td>2.5s</td><td>3.8s</td><td>Usable without frustration</td></tr>
+<tr><td>Cumulative Layout Shift</td><td>0.05</td><td>0.1</td><td>Minimal visual instability</td></tr>
+<tr><td>First Input Delay</td><td>50ms</td><td>100ms</td><td>Responsive to interaction</td></tr>
+<tr><td>Total Bundle Size (JS)</td><td>150KB</td><td>300KB</td><td>Reasonable on 3G</td></tr>
+<tr><td>Total Page Weight</td><td>1MB</td><td>2MB</td><td>Fast on slow connections</td></tr>
+</tbody></table></div>
+<p><strong>Enforcement:</strong></p>
+<pre><code class="language-json">
+// package.json
+"scripts": {
+  "analyze": "webpack-bundle-analyzer",
+  "lighthouse": "lighthouse --preset=desktop --view"
+}
+</code></pre>
+<h3 id="modern-ux-patterns">Modern UX Patterns</h3>
+<p><strong>Micro-interactions:</strong></p>
+<pre><code class="language-javascript">
+// Button feedback
+button:active { transform: scale(0.98); }
+
+// Loading states (no spinners alone)
+&lt;Button&gt;
+  {loading ? (
+    &lt;&gt;
+      &lt;Spinner size="sm" /&gt;
+      &lt;span&gt;Saving...&lt;/span&gt;
+    &lt;/&gt;
+  ) : (
+    'Save Changes'
+  )}
+&lt;/Button&gt;
+
+// Optimistic UI
+const handleLike = async () =&gt; {
+  setLiked(true); // Instant feedback
+  try {
+    await api.like(postId);
+  } catch (error) {
+    setLiked(false); // Rollback on error
+    showError('Failed to like post');
+  }
+};
+</code></pre>
+<p><strong>Progressive Disclosure:</strong></p>
+<pre><code>
+Settings Page:
+├── Common (visible by default)
+│   ├── Profile
+│   ├── Notifications
+│   └── Privacy
+└── Advanced (collapsed, "Show advanced settings")
+    ├── API Keys
+    ├── Developer Tools
+    └── Danger Zone
+</code></pre>
+<p>---</p>
+<h2 id="section-5-language-framework-agility">Section 5: Language &amp; Framework Agility</h2>
+<h3 id="technology-selection-framework">Technology Selection Framework</h3>
+<p><strong>Questions to ask before choosing a tool:</strong></p>
+<pre><code>
+1. Problem Fit
+   - Does this tool solve our specific problem?
+   - Are we using 80% of features or just 20%?
+
+2. Team Dynamics
+   - Can the team learn this in a reasonable time?
+   - Will we be able to hire for this?
+   - Who can maintain this when the expert leaves?
+
+3. Ecosystem Maturity
+   - Active community? (GitHub stars/issues/PRs)
+   - Regular releases? (Not abandoned)
+   - Good documentation? (Try the quickstart)
+   - Security updates? (CVE response time)
+
+4. Total Cost of Ownership
+   - Learning curve cost
+   - Licensing cost
+   - Hosting/runtime cost
+   - Migration cost (if we need to switch)
+
+5. Long-term Viability
+   - Backed by a stable organization?
+   - Competitive landscape (is something better emerging)?
+   - Breaking changes frequency
+</code></pre>
+<h3 id="polyglot-best-practices">Polyglot Best Practices</h3>
+<p><strong>Match language to problem domain:</strong></p>
+<div class="table-wrap"><table>
+<thead><tr><th>Domain</th><th>Strong Fit</th><th>Why</th></tr></thead><tbody>
+<tr><td>Web APIs</td><td>Go, Rust, Node.js</td><td>Concurrency, low latency</td></tr>
+<tr><td>Data Science</td><td>Python, R</td><td>Libraries, notebooks</td></tr>
+<tr><td>Mobile</td><td>Swift, Kotlin, React Native</td><td>Platform integration</td></tr>
+<tr><td>Systems</td><td>Rust, C++, Zig</td><td>Memory control, performance</td></tr>
+<tr><td>Scripting</td><td>Python, Bash, JavaScript</td><td>Rapid iteration</td></tr>
+<tr><td>Enterprise</td><td>Java, C#, Go</td><td>Tooling, type safety</td></tr>
+</tbody></table></div>
+<p><strong>But remember:</strong> The best language is the one your team knows well.</p>
+<p>---</p>
+<h2 id="section-6-ai-assisted-development">Section 6: AI-Assisted Development</h2>
+<h3 id="using-ai-tools-effectively">Using AI Tools Effectively</h3>
+<p><strong>Good AI usage:</strong></p>
+<pre><code>
+✅ Generating boilerplate (CRUD, configs)
+✅ Writing tests for existing functions
+✅ Exploring API usage examples
+✅ Refactoring for readability
+✅ Generating documentation
+✅ Explaining unfamiliar code
+</code></pre>
+<p><strong>Dangerous AI usage:</strong></p>
+<pre><code>
+❌ Implementing algorithms without understanding
+❌ Security-sensitive code (auth, crypto)
+❌ Database migrations
+❌ Production deployment scripts
+❌ Accepting suggestions without review
+</code></pre>
+<p><strong>The AI Code Review Checklist:</strong></p>
+<pre><code>
+Before committing AI-generated code, verify:
+1. I understand every line
+2. It handles errors appropriately
+3. It doesn't have security vulnerabilities
+4. It follows our team's conventions
+5. It has adequate tests
+6. It's not overly complex for the problem
+7. I could explain this to a junior developer
+</code></pre>
+<p>---</p>
+<h2 id="section-7-communication-knowledge-transfer">Section 7: Communication &amp; Knowledge Transfer</h2>
+<h3 id="explaining-your-process">Explaining Your Process</h3>
+<p><strong>When working with juniors or stakeholders, narrate your thinking:</strong></p>
+<pre><code>
+Bad: "I'll use Redis for caching."
+
+Good: "I'm considering caching for this endpoint because:
+1. It's called 1000x/sec with mostly read traffic
+2. Data changes &lt; 1x/hour (stale data is acceptable)
+3. The query takes 500ms (too slow for UX)
+
+I'm choosing Redis over in-memory because:
+- Multiple servers need the same cache
+- Redis has automatic expiration (simplifies logic)
+- We already have Redis in production (no new dependency)
+
+Trade-off: Adds network latency (~5ms), but saves 495ms overall.
+
+Alternative considered: Database query optimization
+- Tried adding indexes, improved to 300ms
+- Still too slow for real-time feel
+- Caching is complementary, not replacement
+"
+</code></pre>
+<h3 id="documentation-philosophy">Documentation Philosophy</h3>
+<p><strong>Code should be self-documenting. Comments explain non-obvious decisions.</strong></p>
+<pre><code class="language-javascript">
+// BAD: Obvious comment
+// Increment counter by 1
+counter++;
+
+// GOOD: Explains why
+// Using exponential backoff instead of fixed retry
+// because API rate limits increase with failures
+const backoff = Math.pow(2, attemptNumber) * 1000;
+
+// BAD: What the code does
+// Loop through users
+users.forEach(user =&gt; { ... });
+
+// GOOD: Why we're doing it this way
+// Process users sequentially (not in parallel) to avoid
+// overwhelming the external API with concurrent requests
+for (const user of users) { ... }
+</code></pre>
+<p>---</p>
+<h2 id="section-8-continuous-improvement-practices">Section 8: Continuous Improvement Practices</h2>
+<h3 id="post-mortem-culture">Post-Mortem Culture</h3>
+<p><strong>After every incident or project:</strong></p>
+<pre><code class="language-markdown">
+## Retrospective Template
+
+### What Went Well
+- Specific wins
+- Processes that worked
+- Tools that helped
+
+### What Went Wrong
+- Issues encountered
+- Bottlenecks
+- Surprises/unknowns
+
+### Root Causes (5 Whys)
+Problem: Deploy failed
+1. Why? Tests passed but production broke
+2. Why? Production environment differs from test
+3. Why? We don't have staging environment
+4. Why? Cost concerns
+5. Why? Haven't measured cost vs. incident cost
+
+### Action Items
+- [ ] Create staging environment (Owner: DevOps, Due: 2 weeks)
+- [ ] Cost analysis: staging vs. incident costs (Owner: PM)
+- [ ] Parity check script for env configs (Owner: Backend Lead)
+</code></pre>
+<h3 id="learning-culture">Learning Culture</h3>
+<p><strong>Build knowledge systematically:</strong></p>
+<p>1. <strong>Weekly Learning Share</strong> (30 min)</p>
+<p>   - Each developer shares one thing learned</p>
+<p>   - Could be: new library, debugging technique, design pattern</p>
+<p>   - Recorded for future reference</p>
+<p>2. <strong>Code Review as Teaching</strong></p>
+<p>   - Questions, not commands</p>
+<p>   - "What happens if this fails?" vs "Add error handling"</p>
+<p>   - Link to resources: "Here's a great article on this pattern"</p>
+<p>3. <strong>Incident Response Log</strong></p>
+<p>   - Public log of all incidents (blameless)</p>
+<p>   - Focus on systems/processes, not people</p>
+<p>   - Required reading for new hires</p>
+<p>---</p>
+<h2 id="section-9-mantras-for-daily-practice">Section 9: Mantras for Daily Practice</h2>
+<h3 id="code-philosophy">Code Philosophy</h3>
+<p>1. <strong>"Simple is not easy"</strong> - Simple solutions require hard thinking</p>
+<p>2. <strong>"Make it work, make it right, make it fast"</strong> - In that order, always</p>
+<p>3. <strong>"Duplication is cheaper than the wrong abstraction"</strong> - Don't DRY prematurely</p>
+<p>4. <strong>"Delete code with confidence"</strong> - Version control remembers</p>
+<p>5. <strong>"The best code is no code"</strong> - Can we solve this without code?</p>
+<h3 id="design-philosophy">Design Philosophy</h3>
+<p>6. <strong>"Design for the 99% use case, support the 1%"</strong> - Don't bloat for edge cases</p>
+<p>7. <strong>"Accessibility is not a feature"</strong> - It's a requirement</p>
+<p>8. <strong>"Mobile-first, desktop-enhanced"</strong> - Start with constraints</p>
+<p>9. <strong>"Fast by default, fancy as enhancement"</strong> - Performance &gt; aesthetics</p>
+<p>10. <strong>"User pain points &gt; stakeholder opinions"</strong> - Data over HiPPO</p>
+<h3 id="process-philosophy">Process Philosophy</h3>
+<p>11. <strong>"Measure twice, code once"</strong> - Analysis prevents waste</p>
+<p>12. <strong>"Fail fast, recover faster"</strong> - Expose errors early</p>
+<p>13. <strong>"Automate the boring stuff"</strong> - Humans are for thinking</p>
+<p>14. <strong>"If it's not in version control, it doesn't exist"</strong> - Including configs</p>
+<p>15. <strong>"Documentation is future you helping past you"</strong> - Write it now</p>
+<h3 id="collaboration-philosophy">Collaboration Philosophy</h3>
+<p>16. <strong>"Strong opinions, weakly held"</strong> - Be confident but flexible</p>
+<p>17. <strong>"Disagree and commit"</strong> - Decide, then move forward together</p>
+<p>18. <strong>"Blameless post-mortems"</strong> - Systems fail, not people</p>
+<p>19. <strong>"Teach by doing"</strong> - Pair programming &gt; documentation</p>
+<p>20. <strong>"No broken windows"</strong> - Fix small issues before they multiply</p>
+<p>---</p>
+<h2 id="section-10-red-flags-warning-signs">Section 10: Red Flags &amp; Warning Signs</h2>
+<h3 id="when-to-pause-and-reassess">When to Pause and Reassess</h3>
+<p><strong>Code smells:</strong></p>
+<ul>
+<li>Functions &gt; 50 lines (usually doing too much)</li>
+<li>Classes &gt; 500 lines (probably multiple responsibilities)</li>
+<li>Files &gt; 1000 lines (should be split)</li>
+<li>Cyclomatic complexity &gt; 10 (too many branches)</li>
+<li>Test coverage &lt; 60% (risky)</li>
+<li>Duplication &gt; 10% (needs refactoring)</li>
+</ul>
+<p><strong>Architecture smells:</strong></p>
+<ul>
+<li>"God objects" that everything depends on</li>
+<li>Circular dependencies between modules</li>
+<li>Database queries in UI components</li>
+<li>Business logic in controllers/routes</li>
+<li>Shared mutable state across threads</li>
+<li>Global variables (especially in libraries)</li>
+</ul>
+<p><strong>Process smells:</strong></p>
+<ul>
+<li>PRs open &gt; 1 week (too large or blocked)</li>
+<li>Multiple "emergency" deploys per week (instability)</li>
+<li>Manual deployment steps (automation needed)</li>
+<li>No staging environment (production testing = bad)</li>
+<li>Flaky tests ignored (trust erosion)</li>
+<li>"Works on my machine" (environment drift)</li>
+</ul>
+<p><strong>Team smells:</strong></p>
+<ul>
+<li>One person understands critical system (bus factor = 1)</li>
+<li>"We'll document it later" (narrator: they didn't)</li>
+<li>"Just ship it, we'll fix bugs later" (tech debt spiral)</li>
+<li>"That's not my job" (silo mentality)</li>
+<li>No one questions decisions (groupthink)</li>
+<li>Blame culture (hiding mistakes)</li>
+</ul>
+<p><strong>When you see these: STOP. Discuss. Fix the root cause.</strong></p>
+<p>---</p>
+<h2 id="quick-reference-card">Quick Reference Card</h2>
+<pre><code>
+┌─────────────────────────────────────────────────────┐
+│ Before Every Decision:                              │
+│ 1. What problem am I solving?                       │
+│ 2. What are the alternatives?                       │
+│ 3. What are the trade-offs?                         │
+│ 4. Can I explain this clearly?                      │
+│ 5. How will this age?                               │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│ Before Every Commit:                                │
+│ ✓ Works correctly (tested)                          │
+│ ✓ Handles errors gracefully                         │
+│ ✓ Readable by others                                │
+│ ✓ Secure (inputs validated)                         │
+│ ✓ Performant (no obvious bottlenecks)               │
+│ ✓ Accessible (WCAG AA compliant)                    │
+│ ✓ Documented (complex parts explained)              │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│ When Stuck:                                         │
+│ 1. Read the error message fully                     │
+│ 2. Check the documentation                          │
+│ 3. Search existing issues/Stack Overflow            │
+│ 4. Create minimal reproduction                      │
+│ 5. Explain problem to rubber duck                   │
+│ 6. Ask teammate with context                        │
+└─────────────────────────────────────────────────────┘
+</code></pre>
+<p>---</p>
+<h2 id="final-thoughts-the-senior-developer-mindset">Final Thoughts: The Senior Developer Mindset</h2>
+<p>Being senior isn't about knowing every framework or language. It's about:</p>
+<p>1. <strong>Systems Thinking</strong> - Seeing how pieces connect and affect each other</p>
+<p>2. <strong>Strategic Laziness</strong> - Avoiding work through good architecture</p>
+<p>3. <strong>Productive Paranoia</strong> - Expecting failure and planning for it</p>
+<p>4. <strong>Teaching Mindset</strong> - Making others better, not hoarding knowledge</p>
+<p>5. <strong>Long-term Thinking</strong> - Code written today will be maintained for years</p>
+<p>6. <strong>Humility</strong> - Admitting "I don't know" and learning constantly</p>
+<p>7. <strong>Pragmatism</strong> - Perfect is the enemy of done</p>
+<p>8. <strong>Empathy</strong> - For users, teammates, and future maintainers</p>
+<p><strong>Your code is read 10x more than it's written. Optimize for the reader.</strong></p>
+<p><strong>Your decisions compound over time. Choose wisely.</strong></p>
+<p><strong>Your influence extends beyond code. Lift others as you climb.</strong></p>
+    </article>
+    <div class="related"><h3>Related pages</h3><div class="rel-grid"><a class="rel-card" href="ARCHITECTURE_IMPROVEMENTS.html"><b>Architecture Improvements</b><span>This implementation improves Phase 1 stability and visual accuracy by fixing fundamental issues in the canvas rendering pipeline and toolbar layout. All changes align with globalru</span></a><a class="rel-card" href="AUDIT_IMPROVEMENTS_2026-07-10.html"><b>Audit Improvements 2026 07 10</b><span>Product: PDFoid</span></a><a class="rel-card" href="COMPLETION_REPORT.html"><b>Completion Report</b><span>Date: October 29, 2025</span></a><a class="rel-card" href="DEEPWIKI.html"><b>Deepwiki</b><span>Primary Objective: Build a high-quality, AI-assisted PDF editor with built-in local AI capabilities.</span></a></div></div>
+    <div class="pager"><a href="how-to-use.html"><span class="k">Previous</span>How To Use</a><a href="index.html"><span class="k">Next</span>Index</a></div>
+    <div class="footer-note">PDFoid · Quantumide-style ultra-linked docs · Apache-2.0 · Lehro Solutions</div>
+  </main>
+  <div class="toc"><h4>On this page</h4><a href="#top">Overview</a></div>
+</div>
+
+<script>
+(function(){
+  const bar=document.querySelector('.progress');
+  const tocLinks=[...document.querySelectorAll('.toc a')];
+  const menu=document.querySelector('.menu-btn');
+  const side=document.querySelector('.side');
+  if(menu&&side){menu.addEventListener('click',()=>side.classList.toggle('open'));}
+  function onScroll(){
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    const p=max>0?(h.scrollTop/max)*100:0;
+    if(bar) bar.style.width=p+'%';
+    const heads=[...document.querySelectorAll('main h2[id], main h3[id]')];
+    let current='';
+    for(const el of heads){ if(el.getBoundingClientRect().top<=120) current=el.id; }
+    tocLinks.forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+current));
+  }
+  document.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+</script>
+
+</body>
+</html>

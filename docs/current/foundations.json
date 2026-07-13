@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "foundations",
+  "title": "Foundations",
+  "status": "current",
+  "audience": [
+    "Document reviewers",
+    "Frontend developers",
+    "Contributors"
+  ],
+  "useWhen": "Use the corresponding current guide for this task.",
+  "sourceOfTruth": "current/foundations.md",
+  "counterparts": {
+    "markdown": "current/foundations.md",
+    "html": "current/foundations.html",
+    "json": "current/foundations.json"
+  },
+  "summary": "Current foundations guidance for PDFoid.",
+  "sections": [
+    {
+      "id": "purpose",
+      "label": "Purpose"
+    },
+    {
+      "id": "on-this-page",
+      "label": "On this page"
+    },
+    {
+      "id": "guidance",
+      "label": "Guidance"
+    },
+    {
+      "id": "verification",
+      "label": "Verification"
+    },
+    {
+      "id": "related-guides",
+      "label": "Related guides"
+    },
+    {
+      "id": "non-negotiable-rules",
+      "label": "Non-negotiable rules"
+    },
+    {
+      "id": "accessibility-baseline",
+      "label": "Accessibility baseline"
+    },
+    {
+      "id": "content-rules",
+      "label": "Content rules"
+    }
+  ],
+  "relatedGuides": [
+    "start-here",
+    "architecture",
+    "quality",
+    "contributing"
+  ],
+  "keywords": [
+    "pdfoid",
+    "foundations",
+    "documentation",
+    "current"
+  ],
+  "lastReviewed": "2026-07-13",
+  "sourceChecksum": "973e3820dea7a1aac2d4b8a6244e39ede7d27be20fd1c7a9a684d728b0faea9a",
+  "generatedAt": "2026-07-13T11:47:55.597128+00:00",
+  "release": "archive-2026-07-13",
+  "validation": {
+    "state": "generated"
+  }
+}

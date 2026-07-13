@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "How To Use",
+  "group": "Guides",
+  "path": ".docs/how-to-use.md",
+  "lead": "Browser PDF viewer/editor with annotations and local text tools.",
+  "content_markdown": "# How to Use PDFoid\n\nBrowser PDF viewer/editor with annotations and local text tools.\n\n## 1) Install & start\n\n```bash\nbun install\nbun run dev\n```\n\nOpen http://localhost:5173\n\nProduction preview:\n\n```bash\nbun run build\nbun run preview\n```\n\n## 2) Core workflow\n1. Upload a PDF\n2. Navigate pages / zoom\n3. Annotate (highlight, text, signature tools as available)\n4. Summarize/extract keywords locally when needed\n5. Export/download results\n\n## 3) Local data\n- Annotations can persist in IndexedDB, scoped by document id\n- No server secrets required for core local use\n\n## 4) Production notes\n- Prefer self-hosted PDF.js worker assets\n- Validate upload limits if fronted by a backend\n\n## Related\n- [INSTALL.md](../../INSTALL.md)\n- [Architecture](./architecture.md)\n- [Security](./security.md)\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}

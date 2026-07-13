@@ -1,0 +1,14 @@
+{
+  "product": "PDFoid",
+  "title": "Codebase Map",
+  "group": "Project",
+  "path": ".docs/codebase-map.md",
+  "lead": "",
+  "content_markdown": "# Codebase Map\n\n## Top-level\n- `index.html`: Vite entry HTML.\n- `package.json`: scripts/deps.\n- `vite.config.ts`: build/dev config and chunk splitting.\n- `tailwind.config.js`, `postcss.config.js`, `src/styles.css`: styling.\n\n## src/\n\n### Entry\n- `src/main.tsx`: React bootstrap.\n- `src/App.tsx`: main layout (viewer + panels), global shortcuts.\n\n### components/\n- `PDFUploader.tsx`: file upload + text extraction for AI features.\n- `PDFViewer.tsx`: renders PDF pages (pdf.js) and handles navigation/zoom.\n- `AnnotationCanvas.tsx`: drawing layer overlay with pixel-accurate coordinate mapping.\n- `AnnotationList.tsx`: list UI for annotations.\n- `DocumentActionsPanel.tsx`: actions such as find/replace, export, etc.\n- `ToolSettingsPanel.tsx`: tool settings UI.\n- `VerticalToolbar.tsx`: tool selection.\n- `ToastContainer.tsx`, `KeyboardShortcutsHelp.tsx`: global UI.\n\n### store/\n- `annotationStore.ts`: annotations CRUD + undo/redo + persistence.\n- `pdfEditorStore.ts`: PDF manipulation (pdf-lib) + search/find/replace helpers.\n- `uiStore.ts`: toasts, preferences, modals.\n\n### utils/\n- `ai.ts`: local summarization/keyword extraction.\n\n### types/\n- `annotations.ts`: annotation domain types.\n\n## Where to change what\n- PDF rendering/zoom/canvas sizing: `src/components/PDFViewer.tsx`\n- Pointer math / drawing correctness: `src/components/AnnotationCanvas.tsx`\n- Find/replace behavior: `src/store/pdfEditorStore.ts`\n- Undo/redo behavior: `src/store/annotationStore.ts`\n",
+  "layout": "quantumide-ultra-link",
+  "theme": {
+    "mode": "light",
+    "accent": "#2457d6",
+    "css": "design-system.css"
+  }
+}
