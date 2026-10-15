@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test'
 import { expect } from '@playwright/test'
-import { PDFDocument, StandardFonts } from 'pdf-lib'
+import { PDFDocument, StandardFonts } from '@cantoo/pdf-lib'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'

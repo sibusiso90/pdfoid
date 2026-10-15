@@ -30,6 +30,11 @@ const toolLabels: Record<ToolType, string> = {
   eraser: 'Eraser',
   stamp: 'Stamp',
   signature: 'Signature',
+  underline: 'Underline',
+  strikethrough: 'Strikethrough',
+  ellipse: 'Ellipse',
+  arrow: 'Arrow',
+  redaction: 'Redact',
 }
 
 const toolDescriptions: Record<ToolType, string> = {
@@ -42,6 +47,11 @@ const toolDescriptions: Record<ToolType, string> = {
   eraser: 'Click on annotations to remove them',
   stamp: 'Add stamp annotations',
   signature: 'Create a signature, then click-and-drag to place it on the document',
+  underline: 'Drag along text to underline it',
+  strikethrough: 'Drag along text to strike it through',
+  ellipse: 'Click and drag to draw an ellipse',
+  arrow: 'Drag from the tail to the tip of the arrow',
+  redaction: 'Drag over content to remove it permanently when you flatten or export',
 }
 
 export function ToolSettingsPanel({

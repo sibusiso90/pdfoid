@@ -2,16 +2,18 @@
  * Single entry point for pdf.js. Every component and store opens documents
  * through `openPdf` so worker setup and password handling live in one place.
  */
-import { getDocument, GlobalWorkerOptions, PasswordException, PasswordResponses } from 'pdfjs-dist'
+import { getDocument, GlobalWorkerOptions, PasswordException, PasswordResponses } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import type { RenderTask, TextItem, TextMarkedContent } from 'pdfjs-dist/types/src/display/api'
-// Bundled by Vite so the worker is served from our own origin (no CDN).
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+// Legacy build: polyfills newer JS (e.g. Math.sumPrecise, used for AES-256)
+// so encrypted PDFs open in every supported browser. The worker is bundled by
+// Vite and served from our own origin (no CDN).
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url'
 
 // Test setup may already point this at the on-disk worker for Node.
 if (!GlobalWorkerOptions.workerSrc) GlobalWorkerOptions.workerSrc = workerUrl
 
-// Runtime data (fonts, cmaps, decoders) served by the `pdfoid:pdfjs-assets` Vite
+// Runtime data (fonts, cmaps, decoders) served by the `pdfoid:vendor-assets` Vite
 // plugin. Tests override the base with a file path, since Node reads from disk.
 const assetBase: string =
   (globalThis as { __PDFJS_ASSET_BASE__?: string }).__PDFJS_ASSET_BASE__ ?? `${import.meta.env.BASE_URL}pdfjs/`

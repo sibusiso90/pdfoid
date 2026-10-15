@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { usePdfEditorStore } from '../store/pdfEditorStore'
-import { PDFDocument } from 'pdf-lib'
+import { PDFDocument } from '@cantoo/pdf-lib'
 
 // Mock pdf-lib
-vi.mock('pdf-lib', async () => {
-    const actual = await vi.importActual('pdf-lib')
+vi.mock('@cantoo/pdf-lib', async () => {
+    const actual = await vi.importActual('@cantoo/pdf-lib')
     return {
         ...actual,
         PDFDocument: {
@@ -41,7 +41,7 @@ vi.mock('pdf-lib', async () => {
 })
 
 // Mock pdfjs-dist for Find/Replace
-vi.mock('pdfjs-dist', () => ({
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
     getDocument: vi.fn(() => ({
         promise: Promise.resolve({
             numPages: 3,

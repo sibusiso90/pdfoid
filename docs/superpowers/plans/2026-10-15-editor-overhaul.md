@@ -17,7 +17,26 @@
 - Bun-first (ADR-0003): `bun.lock` is the only lockfile, and CI installs with Bun.
 - Everything runs locally in the browser. The only network fetch allowed is tesseract language data, and only when the user explicitly starts OCR.
 - Keep HEAD's new theme tokens, dark mode in `styles.css`, and per-document annotation persistence (`currentPdfId`).
-- Every untrusted PDF opened with pdf.js uses `isEvalSupported: false`.
+- pdf.js ≥ 6 (its eval code path, CVE-2024-4367, is removed upstream). Use the legacy build so newer JS (e.g. `Math.sumPrecise`, used for AES-256) is polyfilled.
+
+## Status (2026-10-15)
+
+| Task | State |
+|---|---|
+| 1–4 Repair, security, toolchain, CI | Done — commit e8e322b |
+| 5 Document undo/redo | Done (store) — UI buttons pending redesign |
+| 6 Merge / split | Done (store) — UI pending |
+| 7 Page thumbnails | Not started — pure UI, deferred to after the redesign |
+| 8 Annotation types | Done (types, canvas drawing, flatten, `TOOL_CATALOG`) — toolbar buttons pending |
+| 9 Redaction | Done (store + tool) — export guard added |
+| 10 Forms | Done (store) — panel pending |
+| 11 Passwords | Done (store) — prompt component pending |
+| 12 Page numbers / watermark / header-footer | Done (store) — UI pending |
+| 13 Recent files + autosave | Done (store) — list in uploader pending |
+| 14 OCR | Done (store, self-hosted engine) — button pending |
+| 15 Verification | typecheck, 104 unit tests, build, audit clean; e2e 18/19 (no macOS visual baseline) |
+
+UI work is deliberately left to the parallel redesign (branch built on e8e322b) to avoid conflicts.
 
 ## Review Focus
 

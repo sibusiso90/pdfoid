@@ -104,7 +104,7 @@ const mockPdfDoc = {
     loadingTask: { destroy: vi.fn(async () => {}) },
 }
 
-vi.mock('pdfjs-dist', () => ({
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
     getDocument: vi.fn(() => ({
         promise: Promise.resolve(mockPdfDoc)
     })),

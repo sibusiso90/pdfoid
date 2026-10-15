@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
-import { GlobalWorkerOptions } from 'pdfjs-dist'
+import { GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 // Real (unmocked) pdf.js runs a fake worker in Node; point it at the file on disk.
-GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-dist/build/pdf.worker.min.mjs')
+GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs')
 ;(globalThis as { __PDFJS_ASSET_BASE__?: string }).__PDFJS_ASSET_BASE__ =
     new URL('.', import.meta.resolve('pdfjs-dist/package.json')).pathname
 

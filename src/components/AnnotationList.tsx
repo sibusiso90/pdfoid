@@ -138,6 +138,11 @@ export const AnnotationList: React.FC<AnnotationListProps> = ({ currentPage }) =
       'text-box': 'Text Boxes',
       stamp: 'Stamps',
       signature: 'Signatures',
+      underline: 'Underlines',
+      strikethrough: 'Strikethroughs',
+      ellipse: 'Ellipses',
+      arrow: 'Arrows',
+      redaction: 'Redactions',
     };
     return labels[type] || type;
   };

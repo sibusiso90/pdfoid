@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { PDFDocument, StandardFonts } from 'pdf-lib'
+import { PDFDocument, StandardFonts } from '@cantoo/pdf-lib'
 import { closePdf, isTextItem, openPdf } from '../lib/pdfjs'
 
 const makePdf = async (pages: string[]) => {

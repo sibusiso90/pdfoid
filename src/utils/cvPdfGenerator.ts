@@ -3,7 +3,7 @@
  * Creates polished, professional CVs with distinct visual identities per template
  */
 
-import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib'
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from '@cantoo/pdf-lib'
 import { CVData, CVSettings, CVTemplate } from '../types/cv'
 import { toWinAnsi } from './winAnsi'
 

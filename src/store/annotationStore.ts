@@ -37,6 +37,7 @@ interface AnnotationStore extends AnnotationState {
   setThickness: (thickness: number) => void;
   setOpacity: (opacity: number) => void;
   setFontSize: (size: number) => void;
+  setStampText: (text: string) => void;
   setSignatureTemplate: (dataUrl?: string, mime?: string) => void;
   setCurrentPage: (page: number) => void;
   setIsDrawing: (isDrawing: boolean) => void;
@@ -80,6 +81,7 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
   selectedThickness: ANNOTATION_DEFAULTS.STROKE_WIDTH,
   selectedOpacity: ANNOTATION_DEFAULTS.OPACITY,
   selectedFontSize: ANNOTATION_DEFAULTS.FONT_SIZE,
+  selectedStampText: 'APPROVED',
   signatureDataUrl: undefined,
   signatureMime: undefined,
   currentPage: 1,
@@ -188,6 +190,10 @@ export const useAnnotationStore = create<AnnotationStore>((set, get) => ({
 
   setOpacity: (opacity: number) => {
     set({ selectedOpacity: opacity });
+  },
+
+  setStampText: (text: string) => {
+    set({ selectedStampText: text.trim() || 'APPROVED' });
   },
 
   setFontSize: (size: number) => {

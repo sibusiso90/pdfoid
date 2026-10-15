@@ -12,7 +12,7 @@ import {
 } from './utils/pdfTestHelpers'
 
 // Dynamic Mock for PDF.js
-vi.mock('pdfjs-dist', async () => {
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', async () => {
     // Dynamic import to access shared spy
     const { mockGetTextContent } = await import('./utils/pdfTestHelpers')
     return {
@@ -34,8 +34,8 @@ vi.mock('pdfjs-dist', async () => {
 })
 
 // Mock PDF-Lib
-vi.mock('pdf-lib', async () => {
-    const actual = await vi.importActual('pdf-lib')
+vi.mock('@cantoo/pdf-lib', async () => {
+    const actual = await vi.importActual('@cantoo/pdf-lib')
     const { mockDrawRectangle, mockDrawText, mockSave } = await import('./utils/pdfTestHelpers')
     return {
         ...actual,

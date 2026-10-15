@@ -8,7 +8,7 @@ const toPdfItems = (lines: string[]) =>
     transform: [12, 0, 0, 12, 72, 760 - index * 16],
   }))
 
-vi.mock('pdfjs-dist', () => ({
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
   getDocument: vi.fn(() => ({
     promise: Promise.resolve({
       get numPages() {
