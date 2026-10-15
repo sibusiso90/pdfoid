@@ -41,7 +41,7 @@ vi.mock('pdf-lib', async () => {
 })
 
 // Mock pdfjs-dist for Find/Replace
-vi.mock('pdfjs-dist/legacy/build/pdf.js', () => ({
+vi.mock('pdfjs-dist', () => ({
     getDocument: vi.fn(() => ({
         promise: Promise.resolve({
             numPages: 3,
@@ -55,10 +55,12 @@ vi.mock('pdfjs-dist/legacy/build/pdf.js', () => ({
                 getViewport: () => ({ width: 612, height: 792 }),
                 cleanup: vi.fn()
             }),
-            destroy: vi.fn(),
+            loadingTask: { destroy: vi.fn(async () => {}) },
         })
     })),
     GlobalWorkerOptions: { workerSrc: '' },
+    PasswordException: class extends Error {},
+    PasswordResponses: { NEED_PASSWORD: 1, INCORRECT_PASSWORD: 2 },
 }))
 
 describe('PDF Operations (Store Integration)', () => {

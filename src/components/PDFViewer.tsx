@@ -1,17 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
+import { openPdf, type PDFDocumentProxy, type RenderTask } from '../lib/pdfjs'
 import { AnnotationCanvas } from './AnnotationCanvas'
-
-// Ensure workerSrc is set without reassigning import bindings
-if ((pdfjsLib as any).GlobalWorkerOptions) {
-  ; (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
-}
 
 export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfData: ArrayBuffer; onPageChange?: (page: number) => void; targetPage?: number }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const renderTaskRef = useRef<any | null>(null)
-  const [pdf, setPdf] = useState<any | null>(null)
+  const renderTaskRef = useRef<RenderTask | null>(null)
+  const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null)
   const [pageNum, setPageNum] = useState(1)
   const [scale, setScale] = useState(1.5)
   const [numPages, setNumPages] = useState(0)
@@ -26,15 +21,12 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
     ? pageSize
     : e2eFallbackSize
 
-  const disableWorker = import.meta.env?.VITE_PDFJS_DISABLE_WORKER === '1'
-
   useEffect(() => {
     let cancelled = false
       ; (async () => {
         try {
           setError(null)
-          const dataCopy = new Uint8Array(pdfData.slice(0))
-          const doc = await (pdfjsLib as any).getDocument({ data: dataCopy, disableWorker }).promise
+          const doc = await openPdf(pdfData)
           if (cancelled) return
           setPdf(doc)
           setNumPages(doc.numPages)
@@ -66,13 +58,7 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
           setError(null)
 
           // Cancel previous render task if still running
-          if (renderTaskRef.current) {
-            try {
-              await renderTaskRef.current.cancel()
-            } catch {
-              // ignore cancellation errors
-            }
-          }
+          renderTaskRef.current?.cancel()
 
           // Cleanup previous page resources (textures, etc.)
           // This is critical for preventing memory leaks on long documents
@@ -135,7 +121,7 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
             ctx.scale(dpr, dpr);
           }
 
-          const renderContext: any = { canvasContext: ctx, viewport }
+          const renderContext = { canvas, canvasContext: ctx, viewport }
           // Note: We don't use the 'transform' property of renderContext here because
           // we scaled the ctx directly. This is often more reliable for annotations.
 
@@ -160,12 +146,8 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
     return () => {
       isActive = false
       if (renderTaskRef.current) {
-        // Guard against cancel() not being a function or not returning a promise
         try {
-          const cancelResult = renderTaskRef.current.cancel?.()
-          if (cancelResult && typeof cancelResult.catch === 'function') {
-            cancelResult.catch(() => { })
-          }
+          renderTaskRef.current.cancel()
         } catch {
           // Ignore cancellation errors
         }

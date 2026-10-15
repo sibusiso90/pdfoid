@@ -18,7 +18,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       VITE_E2E: '1',
-      VITE_PDFJS_DISABLE_WORKER: '1',
     },
   },
 })

@@ -12,7 +12,7 @@ import {
 } from './utils/pdfTestHelpers'
 
 // Dynamic Mock for PDF.js
-vi.mock('pdfjs-dist/legacy/build/pdf.js', async () => {
+vi.mock('pdfjs-dist', async () => {
     // Dynamic import to access shared spy
     const { mockGetTextContent } = await import('./utils/pdfTestHelpers')
     return {
@@ -24,10 +24,12 @@ vi.mock('pdfjs-dist/legacy/build/pdf.js', async () => {
                     getViewport: () => ({ width: 600, height: 800 }),
                     cleanup: vi.fn()
                 }),
-                destroy: vi.fn(),
+                loadingTask: { destroy: vi.fn(async () => {}) },
             })
         })),
         GlobalWorkerOptions: { workerSrc: '' },
+    PasswordException: class extends Error {},
+    PasswordResponses: { NEED_PASSWORD: 1, INCORRECT_PASSWORD: 2 },
     }
 })
 
