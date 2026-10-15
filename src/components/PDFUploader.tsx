@@ -1,15 +1,20 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { FILE_CONSTRAINTS } from '../constants'
+import { FilePdf, FolderOpen, WarningCircle } from '@phosphor-icons/react'
 import { Spinner } from './ui'
+import { useUIStore } from '../store/uiStore'
 
 export type PDFUploaderProps = {
   onLoadPDF: (data: ArrayBuffer, fileName: string) => void
+  /** `hero` is the full drop zone for the empty state; `button` is a compact "Open" control */
+  variant?: 'hero' | 'button'
 }
 
 type UploadState = 'idle' | 'loading' | 'success' | 'error'
 
 export default function PDFUploader({
   onLoadPDF,
+  variant = 'hero',
 }: PDFUploaderProps) {
   const [state, setState] = useState<UploadState>('idle')
   const [progress, setProgress] = useState(0)
@@ -20,11 +25,11 @@ export default function PDFUploader({
 
   const validateFile = useCallback((file: File): string | null => {
     if (!(FILE_CONSTRAINTS.ACCEPTED_TYPES as readonly string[]).includes(file.type)) {
-      return 'Please select a valid PDF file.'
+      return 'That file is not a PDF. Choose a file ending in .pdf.'
     }
     const maxSizeBytes = FILE_CONSTRAINTS.MAX_FILE_SIZE_MB * 1024 * 1024
     if (file.size > maxSizeBytes) {
-      return `File size exceeds ${FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB limit.`
+      return `That file is larger than ${FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB. Choose a smaller PDF.`
     }
     return null
   }, [])
@@ -56,7 +61,7 @@ export default function PDFUploader({
       console.error('Failed to load PDF', err)
       setState('error')
       const message = err instanceof Error ? err.message : 'Unknown error occurred'
-      setErrorMessage(`Failed to process PDF: ${message}`)
+      setErrorMessage(`We could not open this PDF: ${message}`)
     } finally {
       setTimeout(() => setProgress(0), 500)
     }
@@ -97,19 +102,58 @@ export default function PDFUploader({
   }, [processFile])
 
   const isLoading = state === 'loading'
-  const progressMessage = 'Loading PDF...'
+  const showErrorToast = useUIStore((s) => s.error)
+
+  // The compact button has no room for inline errors, so surface them as a toast
+  useEffect(() => {
+    if (variant === 'button' && state === 'error' && errorMessage) {
+      showErrorToast(errorMessage)
+    }
+  }, [variant, state, errorMessage, showErrorToast])
+
+  const fileInput = (
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,application/pdf"
+        onChange={handleFileChange}
+        disabled={isLoading}
+        className="sr-only"
+        aria-label="Upload PDF file"
+        aria-describedby="file-upload-description"
+      />
+      <span id="file-upload-description" className="sr-only">
+        Upload a PDF file to view, annotate, and edit. Maximum file size is {FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB.
+      </span>
+    </>
+  )
+
+  if (variant === 'button') {
+    return (
+      <label
+        className="inline-flex items-center gap-2 h-8 px-2.5 rounded-lg text-sm font-semibold text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)] hover:bg-[var(--pdfoid-hover)] cursor-pointer transition-colors duration-200 focus-within:ring-2 focus-within:ring-[var(--pdfoid-ring)]"
+        title={errorMessage ?? 'Open another PDF'}
+      >
+        {isLoading ? <Spinner size="sm" /> : <FolderOpen size={18} aria-hidden />}
+        <span className="hidden xl:inline">Open</span>
+        {fileInput}
+      </label>
+    )
+  }
 
   return (
-    <div className="space-y-4">
-      <label 
+    <div className="w-full space-y-3">
+      <label
         ref={dropZoneRef}
         className={`
-          group relative flex flex-col items-center justify-center w-full p-6 
-          border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300
+          group relative flex flex-col items-center justify-center w-full px-6 py-16
+          rounded-2xl border border-dashed cursor-pointer
+          transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
           focus-within:ring-2 focus-within:ring-[var(--pdfoid-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--pdfoid-bg)]
-          ${isDragOver 
-            ? 'border-[var(--pdfoid-accent2)] bg-[rgba(47,111,94,0.08)]' 
-            : 'border-[rgba(47,33,22,0.18)] hover:border-[rgba(47,33,22,0.28)] hover:bg-[rgba(139,94,52,0.06)]'
+          ${isDragOver
+            ? 'border-[var(--pdfoid-accent)] bg-[var(--pdfoid-accent-soft)] scale-[1.01]'
+            : 'border-[var(--pdfoid-border-strong)] bg-[var(--pdfoid-surface)] hover:border-[var(--pdfoid-muted)]'
           }
           ${isLoading ? 'cursor-wait' : ''}
         `}
@@ -117,76 +161,53 @@ export default function PDFUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className="flex flex-col items-center justify-center">
-          <div 
-            className={`
-              w-14 h-14 bg-[linear-gradient(135deg,rgba(47,111,94,0.14),rgba(139,94,52,0.18))] rounded-2xl 
-              flex items-center justify-center mb-3 transition-transform duration-300 shadow-md
-              ${isDragOver ? 'scale-110' : 'group-hover:scale-110'}
-            `}
-            aria-hidden="true"
-          >
-            {isLoading ? (
-              <Spinner size="lg" className="text-[var(--pdfoid-accent2)]" />
-            ) : (
-              <svg className="w-7 h-7 text-[var(--pdfoid-accent2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            )}
-          </div>
-          <p className="text-sm text-[var(--pdfoid-text)] font-semibold mb-1">
-            {isLoading ? 'Processing PDF...' : 'Drop PDF here or click to browse'}
-          </p>
-          <p className="text-xs text-[var(--pdfoid-muted)]">
-            Supports PDF files up to {FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB
-          </p>
+        <div
+          className={`
+            w-14 h-14 rounded-2xl flex items-center justify-center mb-5
+            bg-[var(--pdfoid-surface-2)] text-[var(--pdfoid-accent)]
+            transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
+            ${isDragOver ? '-translate-y-1' : 'group-hover:-translate-y-0.5'}
+          `}
+          aria-hidden="true"
+        >
+          {isLoading ? <Spinner size="lg" /> : <FilePdf size={28} />}
         </div>
-        <input 
-          ref={fileInputRef}
-          type="file" 
-          accept=".pdf,application/pdf" 
-          onChange={handleFileChange} 
-          disabled={isLoading}
-          className="sr-only"
-          aria-label="Upload PDF file"
-          aria-describedby="file-upload-description"
-        />
-        <span id="file-upload-description" className="sr-only">
-          Upload a PDF file to view, annotate, and analyze. Maximum file size is {FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB.
-        </span>
+        <p className="text-base font-semibold text-[var(--pdfoid-text)]">
+          {isLoading ? 'Processing PDF...' : isDragOver ? 'Release to open' : 'Drop a PDF here'}
+        </p>
+        {!isLoading && (
+          <p className="mt-1 text-sm text-[var(--pdfoid-muted)]">
+            or <span className="font-semibold text-[var(--pdfoid-accent)] group-hover:underline underline-offset-4">browse your files</span>
+          </p>
+        )}
+        <p className="mt-4 text-xs text-[var(--pdfoid-subtle)]">
+          PDF up to {FILE_CONSTRAINTS.MAX_FILE_SIZE_MB}MB
+        </p>
+        {fileInput}
       </label>
 
       {isLoading && (
-        <div className="space-y-2" role="status" aria-live="polite">
-          <div className="w-full bg-[rgba(47,33,22,0.12)] rounded-full h-2.5 overflow-hidden">
-            <div 
-              className="bg-[linear-gradient(90deg,var(--pdfoid-accent2),var(--pdfoid-accent),var(--pdfoid-accent2))] h-2.5 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-              role="progressbar"
-              aria-valuenow={progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="PDF processing progress"
-            />
-          </div>
-          <p className="text-xs text-[var(--pdfoid-muted)] text-center font-medium">
-            {progressMessage}
-          </p>
+        <div className="h-1 w-full rounded-full bg-[var(--pdfoid-surface-2)] overflow-hidden" role="status" aria-live="polite">
+          <div
+            className="h-full rounded-full bg-[var(--pdfoid-accent)] transition-[width] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={{ width: `${Math.max(progress, 8)}%` }}
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="PDF processing progress"
+          />
         </div>
       )}
 
       {state === 'error' && errorMessage && (
-        <div 
-          className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
+        <div
+          className="flex items-start gap-2 rounded-xl px-3 py-2 text-sm bg-[var(--pdfoid-danger-soft)] text-[var(--pdfoid-danger)]"
           role="alert"
           aria-live="assertive"
         >
-          <div className="flex items-start gap-2">
-            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span>{errorMessage}</span>
-          </div>
+          <WarningCircle size={18} className="shrink-0 mt-px" aria-hidden />
+          <span>{errorMessage}</span>
         </div>
       )}
     </div>

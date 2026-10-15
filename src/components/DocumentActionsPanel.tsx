@@ -1,8 +1,25 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import {
+  ArrowLineDown,
+  ArrowLineUp,
+  ArrowsClockwise,
+  ArrowsCounterClockwise,
+  CaretLeft,
+  Crop,
+  ImageSquare,
+  MagnifyingGlass,
+  Plus,
+  Stack,
+  Trash,
+} from '@phosphor-icons/react'
 import { usePdfEditorStore, TextMatch } from '../store/pdfEditorStore'
 import { useAnnotationStore } from '../store/annotationStore'
+import { useUIStore } from '../store/uiStore'
 import { CropModal } from './CropModal'
+import { InspectorSection, actionTile, checkboxClass, fieldClass } from './inspector'
+
+export { InspectorSection }
 
 interface DocumentActionsPanelProps {
   currentPage: number
@@ -28,8 +45,7 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
     findTextMatches,
     replaceMatch,
     flattenAnnotations,
-    exportPdf,
-    setCurrentMatchHighlight,
+        setCurrentMatchHighlight,
     defaultFlashTtlMs,
     autoClearHighlightMs,
     setDefaultFlashTtlMs,
@@ -48,7 +64,6 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
       findTextMatches: state.findTextMatches,
       replaceMatch: state.replaceMatch,
       flattenAnnotations: state.flattenAnnotations,
-      exportPdf: state.exportPdf,
       setCurrentMatchHighlight: state.setCurrentMatchHighlight,
       defaultFlashTtlMs: state.defaultFlashTtlMs,
       autoClearHighlightMs: state.autoClearHighlightMs,
@@ -93,8 +108,19 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
       return true
     }
   })
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+
+  const { error: toastError, info: toastInfo } = useUIStore(
+    useShallow((state) => ({ error: state.error, info: state.info }))
+  )
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  // Disarm the delete confirmation after a short window
+  useEffect(() => {
+    if (!confirmDelete) return
+    const timer = setTimeout(() => setConfirmDelete(false), 4000)
+    return () => clearTimeout(timer)
+  }, [confirmDelete])
 
   const hasDocument = numPages > 0
   const disableButtons = loading || !hasDocument
@@ -104,7 +130,7 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
       await task()
     } catch (err) {
       console.error(label, err)
-      window.alert(`${label} failed. Check console for details.`)
+      toastError(`${label} failed`, err instanceof Error ? err.message : 'Please try again.')
     }
   }
 
@@ -127,7 +153,11 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
 
   const handleDeletePage = async () => {
     if (!hasDocument || numPages <= 1) return
-    if (!window.confirm(`Delete page ${currentPage}? This cannot be undone.`)) return
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      return
+    }
+    setConfirmDelete(false)
     await runSafely('Delete page', async () => {
       await deletePage(currentPage - 1)
       const { numPages: updated } = usePdfEditorStore.getState()
@@ -172,14 +202,14 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
     const bottom = toRatio(margins.bottom)
 
     if ([left, top, right, bottom].some((v) => v < 0 || v >= 1)) {
-      window.alert('Crop values must be between 0 and 100 percent.')
+      toastError('Crop values must be between 0 and 100 percent.')
       return
     }
 
     const width = 1 - left - right
     const height = 1 - top - bottom
     if (width <= 0 || height <= 0) {
-      window.alert('Crop margins remove the entire page. Adjust values and try again.')
+      toastError('Those margins remove the whole page. Use smaller values.')
       return
     }
 
@@ -210,7 +240,7 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
       })
     } catch (err) {
       console.error('Read image file failed', err)
-      window.alert('Failed to read image file. Try another image.')
+      toastError('Could not read that image. Try a PNG or JPEG.')
     } finally {
       event.target.value = ''
     }
@@ -218,7 +248,7 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
 
   const handleFlattenAnnotations = async () => {
     if (!annotations.length) {
-      window.alert('No annotations to flatten.')
+      toastInfo('There are no annotations to flatten.')
       return
     }
     await runSafely('Flatten annotations', async () => {
@@ -332,24 +362,6 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
     }
   }
 
-  const handleExportPdf = async () => {
-    try {
-      const blob = await exportPdf()
-      const downloadName = `${usePdfEditorStore.getState().fileName || 'document'}-edited.pdf`
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = downloadName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    } catch (err) {
-      console.error('Export PDF failed', err)
-      window.alert('Export failed. Check console for details.')
-    }
-  }
-
   const handleFindReplace: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
     if (!findText.trim()) {
@@ -403,34 +415,61 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 space-y-4 w-full">
-      <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">Pages</h3>
+    <div className="w-full">
+      <InspectorSection title="Page" meta={hasDocument ? `${currentPage} of ${numPages}` : undefined}>
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => handleAddPage('before')} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Add Before</button>
-          <button onClick={() => handleAddPage('after')} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Add After</button>
-          <button onClick={handleDeletePage} disabled={disableButtons || numPages <= 1} className="px-2 py-1.5 text-xs bg-red-100 text-red-600 rounded-md hover:bg-red-200 disabled:opacity-50 col-span-2">Delete Page</button>
-          <button onClick={() => handleMovePage('up')} disabled={disableButtons || currentPage === 1} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Move Up</button>
-          <button onClick={() => handleMovePage('down')} disabled={disableButtons || currentPage === numPages} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Move Down</button>
+          <button onClick={() => handleAddPage('before')} disabled={disableButtons} className={actionTile}>
+            <Plus size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Add Before
+          </button>
+          <button onClick={() => handleAddPage('after')} disabled={disableButtons} className={actionTile}>
+            <Plus size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Add After
+          </button>
+          <button onClick={() => handleMovePage('up')} disabled={disableButtons || currentPage === 1} className={actionTile}>
+            <ArrowLineUp size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Move Up
+          </button>
+          <button onClick={() => handleMovePage('down')} disabled={disableButtons || currentPage === numPages} className={actionTile}>
+            <ArrowLineDown size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Move Down
+          </button>
+          <button onClick={() => handleRotate('left')} disabled={disableButtons} className={actionTile}>
+            <ArrowsCounterClockwise size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Rotate Left
+          </button>
+          <button onClick={() => handleRotate('right')} disabled={disableButtons} className={actionTile}>
+            <ArrowsClockwise size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Rotate Right
+          </button>
+          <button onClick={handleCrop} disabled={disableButtons} className={actionTile}>
+            <Crop size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Crop…
+          </button>
+          <button onClick={handleInsertImage} disabled={disableButtons} className={actionTile}>
+            <ImageSquare size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Insert Image…
+          </button>
+          <button
+            onClick={handleFlattenAnnotations}
+            disabled={disableButtons || annotations.length === 0}
+            className={`${actionTile} col-span-2`}
+            title="Burn annotations into the PDF so they can no longer be edited"
+          >
+            <Stack size={16} className="text-[var(--pdfoid-muted)]" aria-hidden />Flatten Annotations
+          </button>
+          <button
+            onClick={handleDeletePage}
+            disabled={disableButtons || numPages <= 1}
+            className={`col-span-2 flex items-center justify-center gap-2 h-9 px-3 rounded-lg text-sm font-semibold transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] ${confirmDelete
+              ? 'bg-[var(--pdfoid-danger)] text-white'
+              : 'text-[var(--pdfoid-danger)] hover:bg-[var(--pdfoid-danger-soft)]'}`}
+            aria-live="polite"
+          >
+            <Trash size={16} aria-hidden />
+            {confirmDelete ? `Confirm delete page ${currentPage}` : 'Delete Page'}
+          </button>
         </div>
-      </div>
+      </InspectorSection>
 
-      <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">Transform</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => handleRotate('left')} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Rotate Left</button>
-          <button onClick={() => handleRotate('right')} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Rotate Right</button>
-          <button onClick={handleCrop} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 col-span-2">Crop…</button>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">Content</h3>
-        <div className="flex flex-col gap-2">
-          <button onClick={handleInsertImage} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 text-left">Insert Image…</button>
-          <form onSubmit={handleFindReplace} className="space-y-2">
-            <div>
-              <label htmlFor="find-text-input" className="text-[11px] font-semibold text-gray-600">Find</label>
+      <InspectorSection title="Find and replace">
+        <form onSubmit={handleFindReplace} className="space-y-3">
+          <div className="space-y-1.5">
+            <label htmlFor="find-text-input" className="text-xs font-medium text-[var(--pdfoid-muted)]">Find</label>
+            <div className="relative">
+              <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--pdfoid-subtle)] pointer-events-none" aria-hidden />
               <input
                 id="find-text-input"
                 value={findText}
@@ -439,142 +478,147 @@ export const DocumentActionsPanel: React.FC<DocumentActionsPanelProps> = ({ curr
                   setReplaceStatus(null)
                   setCurrentMatchHighlight(null)
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleFind()
+                  }
+                }}
                 disabled={disableButtons}
-                className="w-full mt-1 px-2 py-1 border border-gray-200 rounded-md text-xs disabled:bg-gray-100"
+                className={`${fieldClass} pl-9`}
                 placeholder="Text to find"
               />
             </div>
-            <div>
-              <label htmlFor="replace-text-input" className="text-[11px] font-semibold text-gray-600">Replace</label>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="replace-text-input" className="text-xs font-medium text-[var(--pdfoid-muted)]">Replace</label>
+            <input
+              id="replace-text-input"
+              value={replaceValue}
+              onChange={(e) => {
+                setReplaceValue(e.target.value)
+                setReplaceStatus(null)
+              }}
+              disabled={disableButtons}
+              className={fieldClass}
+              placeholder="Replacement text"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--pdfoid-text)]">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
-                id="replace-text-input"
-                value={replaceValue}
-                onChange={(e) => {
-                  setReplaceValue(e.target.value)
+                type="checkbox"
+                checked={matchCase}
+                onChange={(event) => {
+                  const next = event.target.checked
+                  setMatchCase(next)
+                  try { window.localStorage.setItem('pdfoid.matchCase', next ? '1' : '0') } catch { }
                   setReplaceStatus(null)
                 }}
                 disabled={disableButtons}
-                className="w-full mt-1 px-2 py-1 border border-gray-200 rounded-md text-xs disabled:bg-gray-100"
-                placeholder="Replacement text"
+                className={checkboxClass}
               />
-            </div>
-            <div className="flex items-center justify-between gap-2 text-[11px] text-gray-600">
-              <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={matchCase}
-                  onChange={(event) => {
-                    const next = event.target.checked
-                    setMatchCase(next)
-                    try { window.localStorage.setItem('pdfoid.matchCase', next ? '1' : '0') } catch { }
-                    setReplaceStatus(null)
-                  }}
-                  disabled={disableButtons}
-                  className="h-3 w-3"
-                />
-                <span>Match case</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={matchWholeWord}
-                  onChange={(event) => {
-                    const next = event.target.checked
-                    setMatchWholeWord(next)
-                    try { window.localStorage.setItem('pdfoid.wholeWord', next ? '1' : '0') } catch { }
-                    setReplaceStatus(null)
-                  }}
-                  disabled={disableButtons}
-                  className="h-3 w-3"
-                />
-                <span>Whole word</span>
-              </label>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] text-gray-600">
-              <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={keepHighlightAfterAll}
-                  onChange={(e) => {
-                    const next = e.target.checked
-                    setKeepHighlightAfterAll(next)
-                    try { window.localStorage.setItem('pdfoid.keepHighlightAfterAll', next ? '1' : '0') } catch { }
-                  }}
-                  disabled={disableButtons}
-                  className="h-3 w-3"
-                />
-                <span>Keep highlight after Replace All</span>
-              </label>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button aria-label="Execute search" type="button" onClick={handleFind} disabled={disableButtons} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50">Find</button>
-              <button aria-label="Execute replace all" type="submit" disabled={disableButtons} className="px-2 py-1.5 text-xs bg-indigo-500 text-white rounded-md hover:bg-indigo-600 disabled:opacity-50">Replace All</button>
-              {/* Navigation row */}
-              <div className="col-span-2 flex items-center gap-2 min-w-0 flex-wrap">
-                <button type="button" onClick={() => gotoMatch('prev')} disabled={disableButtons || matches.length === 0} className="shrink-0 px-2 py-1 text-xs bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50">Prev</button>
-                <button type="button" onClick={() => gotoMatch('next')} disabled={disableButtons || matches.length === 0} className="shrink-0 px-2 py-1 text-xs bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50">Next</button>
-                <span className="text-[11px] text-gray-500 truncate min-w-0 flex-1">
-                  {matches.length ? `${activeIndex + 1} / ${matches.length} on page ${matches[activeIndex]?.pageIndex + 1}` : '—'}
-                </span>
-              </div>
-              {/* Replace actions row */}
-              <div className="col-span-2 flex justify-end gap-2">
-                <button aria-label="Replace current match" type="button" onClick={handleReplaceOne} disabled={disableButtons || activeIndex < 0} className="px-2 py-1.5 text-xs bg-emerald-500 text-white rounded-md hover:bg-emerald-600 disabled:opacity-50">Replace</button>
-                <button aria-label="Replace current match and find next" type="button" onClick={handleReplaceOneAndNext} disabled={disableButtons || activeIndex < 0} className="px-2 py-1.5 text-xs bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50">Replace + Next</button>
-              </div>
-            </div>
-            {replaceStatus && <p className="text-[11px] text-gray-500">{replaceStatus}</p>}
-          </form>
-          <button onClick={handleFlattenAnnotations} disabled={disableButtons || annotations.length === 0} className="px-2 py-1.5 text-xs bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 text-left">Flatten Annotations</button>
-        </div>
-      </div>
-
-      <div>
-        <button onClick={handleExportPdf} disabled={disableButtons} className="w-full px-3 py-2 text-xs bg-emerald-500 text-white rounded-md hover:bg-emerald-600 disabled:opacity-50 font-semibold">Export Edited PDF</button>
-      </div>
-
-      <div className="border-t border-gray-200 pt-3">
-        <button
-          type="button"
-          onClick={() => setSettingsOpen((v) => !v)}
-          className="w-full text-left text-xs font-semibold text-gray-700 flex items-center justify-between"
-        >
-          <span>Settings</span>
-          <span className="text-gray-400">{settingsOpen ? '▴' : '▾'}</span>
-        </button>
-        {settingsOpen && (
-          <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-600">
-            <label className="col-span-2 flex items-center justify-between gap-2">
-              <span>Flash duration (ms)</span>
-              <input
-                type="number"
-                min={100}
-                step={50}
-                value={defaultFlashTtlMs}
-                onChange={(e) => {
-                  const n = Number(e.target.value)
-                  setDefaultFlashTtlMs(Number.isFinite(n) ? n : 900)
-                }}
-                className="w-28 px-2 py-1 border border-gray-200 rounded-md text-xs"
-              />
+              <span>Match case</span>
             </label>
-            <label className="col-span-2 flex items-center justify-between gap-2">
-              <span>Auto-clear highlight (ms, 0 = never)</span>
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
-                type="number"
-                min={0}
-                step={250}
-                value={autoClearHighlightMs}
-                onChange={(e) => {
-                  const n = Number(e.target.value)
-                  setAutoClearHighlightMs(Number.isFinite(n) ? n : 0)
+                type="checkbox"
+                checked={matchWholeWord}
+                onChange={(event) => {
+                  const next = event.target.checked
+                  setMatchWholeWord(next)
+                  try { window.localStorage.setItem('pdfoid.wholeWord', next ? '1' : '0') } catch { }
+                  setReplaceStatus(null)
                 }}
-                className="w-28 px-2 py-1 border border-gray-200 rounded-md text-xs"
+                disabled={disableButtons}
+                className={checkboxClass}
               />
+              <span>Whole word</span>
             </label>
           </div>
-        )}
-      </div>
+
+          <div className="flex items-center gap-2">
+            <button aria-label="Execute search" type="button" onClick={handleFind} disabled={disableButtons} className={`${actionTile} flex-1 justify-center`}>Find</button>
+            <button
+              aria-label="Execute replace all"
+              type="submit"
+              disabled={disableButtons}
+              className="flex-1 h-9 px-3 rounded-lg text-sm font-semibold bg-[var(--pdfoid-text)] text-[var(--pdfoid-surface)] hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)]"
+            >
+              Replace All
+            </button>
+          </div>
+
+          {/* Match navigation */}
+          <div className="flex items-center gap-1 h-9 pl-3 pr-1 rounded-lg bg-[var(--pdfoid-surface-2)]">
+            <span className="flex-1 min-w-0 truncate text-sm text-[var(--pdfoid-muted)] tabular-nums">
+              {matches.length ? `${activeIndex + 1} / ${matches.length} on page ${matches[activeIndex]?.pageIndex + 1}` : 'No matches yet'}
+            </span>
+            <button type="button" onClick={() => gotoMatch('prev')} disabled={disableButtons || matches.length === 0} aria-label="Prev" className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)] hover:bg-[var(--pdfoid-surface)] disabled:opacity-35 disabled:pointer-events-none transition-colors duration-200">
+              <CaretLeft size={14} weight="bold" aria-hidden />
+            </button>
+            <button type="button" onClick={() => gotoMatch('next')} disabled={disableButtons || matches.length === 0} className="inline-flex items-center justify-center h-7 px-2 rounded-md text-sm font-medium text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)] hover:bg-[var(--pdfoid-surface)] disabled:opacity-35 disabled:pointer-events-none transition-colors duration-200">
+              Next
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            <button aria-label="Replace current match" type="button" onClick={handleReplaceOne} disabled={disableButtons || activeIndex < 0} className={`${actionTile} flex-1 justify-center`}>Replace</button>
+            <button aria-label="Replace current match and find next" type="button" onClick={handleReplaceOneAndNext} disabled={disableButtons || activeIndex < 0} className={`${actionTile} flex-1 justify-center`}>
+              Replace + Next
+            </button>
+          </div>
+          {replaceStatus && <p className="text-sm text-[var(--pdfoid-muted)]" role="status">{replaceStatus}</p>}
+
+          <label className="flex items-center gap-2 text-sm text-[var(--pdfoid-muted)] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={keepHighlightAfterAll}
+              onChange={(e) => {
+                const next = e.target.checked
+                setKeepHighlightAfterAll(next)
+                try { window.localStorage.setItem('pdfoid.keepHighlightAfterAll', next ? '1' : '0') } catch { }
+              }}
+              disabled={disableButtons}
+              className={checkboxClass}
+            />
+            <span>Keep highlight after Replace All</span>
+          </label>
+        </form>
+      </InspectorSection>
+
+      <InspectorSection title="Highlight timing" defaultOpen={false}>
+        <div className="space-y-3 text-sm text-[var(--pdfoid-text)]">
+          <label className="flex items-center justify-between gap-3">
+            <span>Flash duration (ms)</span>
+            <input
+              type="number"
+              min={100}
+              step={50}
+              value={defaultFlashTtlMs}
+              onChange={(e) => {
+                const n = Number(e.target.value)
+                setDefaultFlashTtlMs(Number.isFinite(n) ? n : 900)
+              }}
+              className={`${fieldClass} w-24 tabular-nums`}
+            />
+          </label>
+          <label className="flex items-center justify-between gap-3">
+            <span>Auto clear highlight (ms, 0 is never)</span>
+            <input
+              type="number"
+              min={0}
+              step={250}
+              value={autoClearHighlightMs}
+              onChange={(e) => {
+                const n = Number(e.target.value)
+                setAutoClearHighlightMs(Number.isFinite(n) ? n : 0)
+              }}
+              className={`${fieldClass} w-24 tabular-nums`}
+            />
+          </label>
+        </div>
+      </InspectorSection>
 
       <input ref={imageInputRef} type="file" accept="image/png,image/jpeg" onChange={onImageSelected} className="hidden" />
       {cropModalOpen && (

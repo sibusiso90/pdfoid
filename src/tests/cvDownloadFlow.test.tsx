@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { RightSidebar } from '../App'
+import { CvExportPanel } from '../components/CvExportPanel'
 import { usePdfEditorStore } from '../store/pdfEditorStore'
 import { useCVStore } from '../store/cvStore'
 import { useUIStore } from '../store/uiStore'
@@ -97,7 +97,7 @@ describe('CV download flow', () => {
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
 
-    render(<RightSidebar onLoadPDF={() => {}} />)
+    render(<CvExportPanel />)
     fireEvent.click(screen.getByRole('button', { name: 'Parse & Download CV PDF' }))
 
     await waitFor(() => expect(mockExtractCVDataFromPdf).toHaveBeenCalled())
@@ -135,7 +135,7 @@ describe('CV download flow', () => {
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
 
-    render(<RightSidebar onLoadPDF={() => {}} />)
+    render(<CvExportPanel />)
     fireEvent.click(screen.getByRole('button', { name: 'Use Classic template' }))
     expect(useCVStore.getState().settings.template).toBe('classic')
 
@@ -168,7 +168,7 @@ describe('CV download flow', () => {
 
     vi.spyOn(window, 'confirm').mockReturnValue(false)
 
-    render(<RightSidebar onLoadPDF={() => {}} />)
+    render(<CvExportPanel />)
     fireEvent.click(screen.getByRole('button', { name: 'Parse & Download CV PDF' }))
 
     await waitFor(() => expect(mockExtractCVDataFromPdf).toHaveBeenCalled())
@@ -186,7 +186,7 @@ describe('CV download flow', () => {
       pagesScanned: 1,
     })
 
-    render(<RightSidebar onLoadPDF={() => {}} />)
+    render(<CvExportPanel />)
     fireEvent.click(screen.getByRole('button', { name: 'Parse & Download CV PDF' }))
 
     await waitFor(() => expect(mockExtractCVDataFromPdf).toHaveBeenCalled())
@@ -197,7 +197,7 @@ describe('CV download flow', () => {
   it('blocks download when parsing throws', async () => {
     mockExtractCVDataFromPdf.mockRejectedValue(new Error('Parser failed'))
 
-    render(<RightSidebar onLoadPDF={() => {}} />)
+    render(<CvExportPanel />)
     fireEvent.click(screen.getByRole('button', { name: 'Parse & Download CV PDF' }))
 
     await waitFor(() => expect(mockExtractCVDataFromPdf).toHaveBeenCalled())

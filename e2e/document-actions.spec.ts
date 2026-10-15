@@ -150,7 +150,7 @@ test('document actions: pages, transform, content, export', async ({ page }) => 
 
   // Export edited PDF
   await waitForReactSettle(page)
-  const exportPdfBtn = page.getByRole('button', { name: 'Export Edited PDF' }).first()
+  const exportPdfBtn = page.getByRole('button', { name: 'Download PDF' }).first()
   await exportPdfBtn.waitFor({ state: 'visible' })
   const exportPdf = page.waitForEvent('download')
   await exportPdfBtn.click()
