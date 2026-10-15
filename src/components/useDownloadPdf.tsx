@@ -14,7 +14,8 @@ export function downloadBlob(blob: Blob, name: string) {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  // Revoking synchronously can cancel the download in Safari and Firefox
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 const editedName = () => `${usePdfEditorStore.getState().fileName || 'document'}-edited.pdf`

@@ -1293,5 +1293,6 @@ export async function downloadCV(
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    // Revoking synchronously can cancel the download in Safari and Firefox
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
