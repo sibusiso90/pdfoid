@@ -13,8 +13,13 @@
   burned into the pixels. This guarantees the content is gone, but the whole page
   stops being selectable/searchable and its links and form fields are removed.
   Run OCR afterwards if the remaining text must be searchable.
-- Redaction does not touch document-level data such as metadata, bookmarks or
-  attachments.
+- Form fields with a widget on a redacted page are removed (their values would
+  otherwise survive in the form). Accessibility tagging (the structure tree) is
+  removed from the whole document, since alt/ActualText can repeat page text.
+- Objects no longer referenced after redaction are deleted before saving, so the
+  old page content cannot be recovered from the file.
+- Redaction does not touch document-level data such as the document title or
+  other metadata, bookmark titles, or attachments.
 - Export is blocked while redaction marks are unapplied (`PendingRedactionsError`);
   flatten annotations first.
 
