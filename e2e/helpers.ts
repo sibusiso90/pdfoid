@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test'
 import { expect } from '@playwright/test'
-import { PDFDocument, StandardFonts } from 'pdf-lib'
+import { PDFDocument, StandardFonts } from '@cantoo/pdf-lib'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
@@ -37,7 +37,7 @@ export async function uploadSamplePdf(page: Page, useRealPdf = true): Promise<vo
     try { indexedDB.deleteDatabase('pdfoid_db') } catch {}
   })
   await page.goto('/')
-  await expect(page.getByText('Upload Document')).toBeVisible({ timeout: 15000 })
+  await expect(page.getByText('Drop a PDF here')).toBeVisible({ timeout: 15000 })
   
   // Use real PDF if available, otherwise fall back to generated sample
   let buffer: Buffer

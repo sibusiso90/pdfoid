@@ -1,17 +1,18 @@
-// @ts-ignore
 import { create } from 'zustand'
-// @ts-ignore
-import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib'
+import { PDFDocument, StandardFonts, degrees, rgb, type PDFFont } from '@cantoo/pdf-lib'
+import { toWinAnsi } from '../utils/winAnsi'
+import { arrowHeadWings } from '../utils/geometry'
+import { extractPages, mergePdfs, parsePageRanges } from '../utils/pdfOps/mergeSplit'
+import { addHeaderFooter, addPageNumbers, addWatermark, type HeaderFooterOptions, type PageNumberOptions, type WatermarkOptions } from '../utils/pdfOps/stamping'
+import { fillForm, readFormFields, type FormField, type FormValue } from '../utils/pdfOps/forms'
+import { decryptPdf, encryptPdf } from '../utils/pdfOps/encrypt'
+import { applyRedactions, type RedactingRasterizer, type RedactionRegion } from '../utils/pdfOps/redact'
+import { addInvisibleTextLayer } from '../utils/pdfOps/textLayer'
+import { recognizePage, type OcrProgress } from '../utils/ocr'
+import { loadRecent, saveRecent } from '../utils/recentFiles'
 import type { Annotation } from '../types/annotations'
-// @ts-ignore
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
-
-// Reuse worker configuration for pdf.js
-if ((pdfjsLib as any).GlobalWorkerOptions) {
-  ; (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
-}
-
-const disablePdfJsWorker = import.meta.env?.VITE_PDFJS_DISABLE_WORKER === '1'
+import { useAnnotationStore } from './annotationStore'
+import { closePdf, openPdf } from '../lib/pdfjs'
 
 // Debug logging helpers (opt-in via localStorage key 'pdfoid.debug' = '1')
 const shouldDebug = (): boolean => {
@@ -37,6 +38,85 @@ const makeDebug = () => {
   }
 }
 const debugLog = makeDebug()
+
+// Standard fonts only encode WinAnsi; measuring or drawing other characters throws.
+const measureText = (font: PDFFont, text: string, size: number) => font.widthOfTextAtSize(toWinAnsi(text), size)
+
+interface CvDetectionResult {
+  isCv: boolean
+  score: number
+  keywords: string[]
+  pagesScanned: number
+}
+
+const cvKeywordSignals: Array<{ term: string; weight: number; label: string }> = [
+  { term: 'curriculum vitae', weight: 3, label: 'curriculum vitae' },
+  { term: 'resume', weight: 2, label: 'resume' },
+  { term: 'professional summary', weight: 2, label: 'professional summary' },
+  { term: 'summary', weight: 1.5, label: 'summary' },
+  { term: 'experience', weight: 2, label: 'experience' },
+  { term: 'work experience', weight: 2, label: 'work experience' },
+  { term: 'employment', weight: 1.5, label: 'employment' },
+  { term: 'education', weight: 2, label: 'education' },
+  { term: 'skills', weight: 2, label: 'skills' },
+  { term: 'certifications', weight: 1.5, label: 'certifications' },
+  { term: 'projects', weight: 1.5, label: 'projects' },
+  { term: 'languages', weight: 1, label: 'languages' },
+  { term: 'portfolio', weight: 1, label: 'portfolio' },
+  { term: 'linkedin', weight: 1, label: 'linkedin' },
+]
+
+const cvFileNameSignals = [/\\bcv\\b/i, /resume/i, /curriculum[- ]vitae/i]
+
+const extractCvText = async (bytes: Uint8Array, maxPages: number): Promise<{ text: string; pages: number }> => {
+  const readerData = bytes.slice()
+  const pdfReader = await openPdf(readerData)
+  const totalPages = Math.min(maxPages, pdfReader.numPages || maxPages)
+  let output = ''
+
+  for (let i = 0; i < totalPages; i++) {
+    const pdfjsPage = await pdfReader.getPage(i + 1)
+    const textContent = await pdfjsPage.getTextContent()
+    const items = Array.isArray(textContent.items) ? (textContent.items as any[]) : []
+    const pageText = items.map((item) => (typeof item?.str === 'string' ? item.str : '')).join(' ')
+    output += ` ${pageText}`
+    if (output.length > 20000) break
+  }
+
+  return { text: output, pages: totalPages }
+}
+
+const detectCvFromPdf = async (bytes: Uint8Array, fileName: string): Promise<CvDetectionResult> => {
+  try {
+    const { text, pages } = await extractCvText(bytes, 2)
+    const normalized = text.replace(/\\s+/g, ' ').toLowerCase()
+    let score = 0
+    const keywords: string[] = []
+    const coreHits = new Set<string>()
+
+    for (const signal of cvKeywordSignals) {
+      if (!normalized.includes(signal.term)) continue
+      const regex = new RegExp(`\\b${signal.term.replace(/[-/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&')}\\b`, 'g')
+      const count = Math.min(2, (normalized.match(regex) || []).length || 1)
+      score += signal.weight * count
+      if (!keywords.includes(signal.label)) keywords.push(signal.label)
+      if (['experience', 'education', 'skills', 'summary', 'professional summary'].includes(signal.term)) {
+        coreHits.add(signal.term)
+      }
+    }
+
+    if (cvFileNameSignals.some((pattern) => pattern.test(fileName))) {
+      score += 2
+      if (!keywords.includes('filename')) keywords.push('filename')
+    }
+
+    const isCv = score >= 5 || coreHits.size >= 2
+    return { isCv, score: Math.round(score * 10) / 10, keywords, pagesScanned: pages }
+  } catch (err) {
+    console.warn('CV detection failed', err)
+    return { isCv: false, score: 0, keywords: [], pagesScanned: 0 }
+  }
+}
 
 interface BlankPageOptions {
   position?: 'start' | 'end' | number
@@ -106,12 +186,42 @@ interface PdfEditorState {
   flashRects?: Array<{ pageIndex: number; rectNorm: { left: number; top: number; width: number; height: number }; addedAt: number; ttlMs: number }>
   lastFindResults?: TextMatch[]
   lastFindOptions?: FindTextOptions
+  isCvDocument: boolean
+  cvDetection: CvDetectionResult | null
+  cvDetectionLoading: boolean
+  _cvDetectionId?: number
   // UI/visual settings
   defaultFlashTtlMs: number
   autoClearHighlightMs: number
   _highlightClearTimerId?: number
+  // Document history (page operations, edits). Annotations have their own undo.
+  docPast: DocSnapshot[]
+  docFuture: DocSnapshot[]
+  canUndoDocument: boolean
+  canRedoDocument: boolean
+  /** Set when the opened file is encrypted; the UI shows a password prompt. */
+  passwordRequest: { fileName: string; reason: 'needed' | 'incorrect' } | null
+  _pendingEncrypted?: { bytes: Uint8Array; fileName: string; recentId?: string }
+  /** IndexedDB id the working copy autosaves under. */
+  recentId: string | null
 
-  loadDocument: (bytes: ArrayBuffer, fileName: string) => Promise<void>
+  loadDocument: (bytes: ArrayBuffer, fileName: string, opts?: { password?: string; recentId?: string }) => Promise<void>
+  submitPassword: (password: string) => Promise<void>
+  cancelPasswordRequest: () => void
+  openRecent: (id: string) => Promise<void>
+  undoDocument: () => void
+  redoDocument: () => void
+  mergeDocuments: (files: ArrayBuffer[]) => Promise<void>
+  /** Returns a new PDF of the selected pages ("1-3, 5"); the open document is unchanged. */
+  extractPagesToBlob: (selection: string) => Promise<Blob>
+  addPageNumbers: (opts?: PageNumberOptions) => Promise<void>
+  addWatermark: (opts: WatermarkOptions) => Promise<void>
+  addHeaderFooter: (opts: HeaderFooterOptions) => Promise<void>
+  getFormFields: () => Promise<FormField[]>
+  fillFormFields: (values: Record<string, FormValue>, opts?: { flatten?: boolean }) => Promise<void>
+  redact: (regions: RedactionRegion[], opts?: { rasterize?: RedactingRasterizer }) => Promise<void>
+  /** OCRs one page and adds an invisible text layer. Resolves to the number of words found. */
+  ocrPage: (pageIndex: number, onProgress?: (p: OcrProgress) => void) => Promise<number>
   resetToOriginal: () => void
   addBlankPage: (options?: BlankPageOptions) => Promise<void>
   insertImage: (options: InsertImageOptions) => Promise<void>
@@ -126,8 +236,10 @@ interface PdfEditorState {
   addFlashRect: (pageIndex: number, rectPts: { x: number; y: number; width: number; height: number }, ttlMs?: number) => void
   setDefaultFlashTtlMs: (ms: number) => void
   setAutoClearHighlightMs: (ms: number) => void
-  flattenAnnotations: (annotations: Annotation[]) => Promise<void>
-  exportPdf: () => Promise<Blob>
+  /** Burns annotations into the pages. Redaction marks are applied first, as true redactions. */
+  flattenAnnotations: (annotations: Annotation[], opts?: { rasterize?: RedactingRasterizer }) => Promise<void>
+  /** Throws PendingRedactionsError while redaction marks are unapplied. */
+  exportPdf: (opts?: { password?: string }) => Promise<Blob>
   clearError: () => void
 }
 
@@ -170,6 +282,80 @@ const hexToRgb = (input?: string): { r: number; g: number; b: number; opacity: n
   return { r: 1, g: 0, b: 0, opacity: 1 }
 }
 
+export const MAX_DOC_HISTORY = 20
+const AUTOSAVE_DELAY_MS = 1000
+
+interface DocSnapshot {
+  pdfData: Uint8Array
+  numPages: number
+  pageSizes: Array<{ width: number; height: number }>
+}
+
+type SetState = (partial: Partial<PdfEditorState>) => void
+
+const pageInfo = (doc: PDFDocument) => ({
+  numPages: doc.getPageCount(),
+  pageSizes: doc.getPages().map((p) => p.getSize()),
+})
+
+let autosaveTimer: ReturnType<typeof setTimeout> | undefined
+const scheduleAutosave = (get: () => PdfEditorState) => {
+  clearTimeout(autosaveTimer)
+  autosaveTimer = setTimeout(() => {
+    const { recentId, fileName, pdfData } = get()
+    if (!recentId || !pdfData) return
+    saveRecent({ id: recentId, name: fileName, bytes: pdfData }).catch((err) => console.warn('Autosave failed', err))
+  }, AUTOSAVE_DELAY_MS)
+}
+
+const snapshotOf = (state: PdfEditorState): DocSnapshot | null =>
+  state.pdfData ? { pdfData: state.pdfData, numPages: state.numPages, pageSizes: state.pageSizes ?? [] } : null
+
+/** Makes `next` the working document, recording the previous one for undo. */
+const commit = (get: () => PdfEditorState, set: SetState, next: DocSnapshot) => {
+  const state = get()
+  const previous = snapshotOf(state)
+  const docPast = previous ? [...state.docPast, previous].slice(-MAX_DOC_HISTORY) : state.docPast
+  set({
+    ...next,
+    docPast,
+    docFuture: [],
+    canUndoDocument: docPast.length > 0,
+    canRedoDocument: false,
+    loading: false,
+    dirty: true,
+    pdfRevision: (state.pdfRevision ?? 0) + 1,
+    currentMatchHighlight: null,
+  })
+  scheduleAutosave(get)
+}
+
+/** Runs a bytes → bytes operation on the working document and commits the result. */
+const withPdfBytes = async (
+  get: () => PdfEditorState,
+  set: SetState,
+  op: (bytes: Uint8Array) => Promise<Uint8Array>,
+) => {
+  const bytes = get().pdfData
+  if (!bytes) throw new Error('No PDF loaded')
+  set({ loading: true, error: undefined })
+  try {
+    const result = new Uint8Array(await op(bytes))
+    commit(get, set, { pdfData: result, ...pageInfo(await PDFDocument.load(result, { updateMetadata: false })) })
+  } catch (err) {
+    console.error('PDF operation failed', err)
+    set({ loading: false, error: err instanceof Error ? err.message : 'PDF operation failed' })
+    throw err
+  }
+}
+
+export class PendingRedactionsError extends Error {
+  constructor(public readonly count: number) {
+    super(`${count} redaction mark${count === 1 ? ' is' : 's are'} not applied yet. Flatten annotations to remove that content before exporting.`)
+    this.name = 'PendingRedactionsError'
+  }
+}
+
 const cloneUint8Array = (input: Uint8Array) => new Uint8Array(input.buffer.slice(input.byteOffset, input.byteOffset + input.byteLength))
 
 const withPdfDocument = async (
@@ -187,15 +373,7 @@ const withPdfDocument = async (
     const doc = await PDFDocument.load(bytes, { updateMetadata: false, ignoreEncryption: true })
     await mutator(doc)
     const saved = await doc.save()
-    const nextRevision = (get().pdfRevision ?? 0) + 1
-    set({
-      pdfData: new Uint8Array(saved),
-      numPages: doc.getPageCount(),
-      pageSizes: doc.getPages().map((p: any) => p.getSize()),
-      loading: false,
-      dirty: true,
-      pdfRevision: nextRevision,
-    })
+    commit(get, set, { pdfData: new Uint8Array(saved), ...pageInfo(doc) })
   } catch (err: any) {
     console.error('PDF mutation failed', err)
     set({ loading: false, error: err?.message || 'PDF mutation failed' })
@@ -238,6 +416,10 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
   error: undefined,
   dirty: false,
   pdfRevision: 0,
+  isCvDocument: false,
+  cvDetection: null,
+  cvDetectionLoading: false,
+  _cvDetectionId: undefined,
   // Initialize settings from localStorage with safe defaults
   defaultFlashTtlMs: (() => {
     try {
@@ -255,24 +437,67 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
   })(),
   _highlightClearTimerId: undefined,
 
-  loadDocument: async (bytes: ArrayBuffer, fileName: string) => {
+  docPast: [],
+  docFuture: [],
+  canUndoDocument: false,
+  canRedoDocument: false,
+  passwordRequest: null,
+  _pendingEncrypted: undefined,
+  recentId: null,
+
+  loadDocument: async (bytes: ArrayBuffer, fileName: string, opts: { password?: string; recentId?: string } = {}) => {
     try {
       set({ loading: true, error: undefined })
-      const copy = new Uint8Array(bytes.slice(0))
-      const doc = await PDFDocument.load(copy, { updateMetadata: false, ignoreEncryption: true })
-      const pageSizes = Array.from({ length: doc.getPageCount() }, (_, i) => doc.getPage(i).getSize())
+      let copy = new Uint8Array(bytes.slice(0))
+      const probe = await PDFDocument.load(copy, { updateMetadata: false, ignoreEncryption: true })
+      if (probe.isEncrypted) {
+        // Many "encrypted" PDFs only restrict permissions and open with an empty
+        // password; otherwise ask the user.
+        try {
+          copy = new Uint8Array(await decryptPdf(copy, opts.password ?? ''))
+        } catch {
+          set({
+            loading: false,
+            passwordRequest: { fileName, reason: opts.password === undefined ? 'needed' : 'incorrect' },
+            _pendingEncrypted: { bytes: copy, fileName, recentId: opts.recentId },
+          })
+          return
+        }
+      }
+      const doc = probe.isEncrypted ? await PDFDocument.load(copy, { updateMetadata: false }) : probe
       const nextRevision = (get().pdfRevision ?? 0) + 1
+      const detectionId = Date.now()
+      clearTimeout(autosaveTimer)
       set({
         fileName,
         pdfData: copy,
         originalPdfData: cloneUint8Array(copy),
-        numPages: doc.getPageCount(),
+        ...pageInfo(doc),
         loading: false,
         dirty: false,
         pdfRevision: nextRevision,
-        pageSizes,
         currentMatchHighlight: null,
         flashRects: [],
+        isCvDocument: false,
+        cvDetection: null,
+        cvDetectionLoading: true,
+        _cvDetectionId: detectionId,
+        docPast: [],
+        docFuture: [],
+        canUndoDocument: false,
+        canRedoDocument: false,
+        passwordRequest: null,
+        _pendingEncrypted: undefined,
+        recentId: opts.recentId ?? crypto.randomUUID(),
+      })
+      scheduleAutosave(get)
+
+      void detectCvFromPdf(copy, fileName).then((result) => {
+        if (get()._cvDetectionId !== detectionId) return
+        set({ isCvDocument: result.isCv, cvDetection: result, cvDetectionLoading: false })
+      }).catch(() => {
+        if (get()._cvDetectionId !== detectionId) return
+        set({ isCvDocument: false, cvDetection: null, cvDetectionLoading: false })
       })
     } catch (err: any) {
       console.error('Failed to load PDF document', err)
@@ -283,16 +508,115 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
         originalPdfData: null,
         fileName: '',
         numPages: 0,
+        isCvDocument: false,
+        cvDetection: null,
+        cvDetectionLoading: false,
+        _cvDetectionId: undefined,
+        docPast: [],
+        docFuture: [],
+        canUndoDocument: false,
+        canRedoDocument: false,
+        recentId: null,
       })
       throw err
     }
   },
 
+  submitPassword: async (password: string) => {
+    const pending = get()._pendingEncrypted
+    if (!pending) return
+    await get().loadDocument(pending.bytes.slice().buffer as ArrayBuffer, pending.fileName, { password, recentId: pending.recentId })
+  },
+
+  cancelPasswordRequest: () => set({ passwordRequest: null, _pendingEncrypted: undefined }),
+
+  openRecent: async (id: string) => {
+    const entry = await loadRecent(id)
+    if (!entry) throw new Error('That file is no longer in recent files.')
+    await get().loadDocument(entry.bytes.slice().buffer as ArrayBuffer, entry.name, { recentId: id })
+  },
+
   resetToOriginal: () => {
     const original = get().originalPdfData
     if (!original) return
-    const nextRevision = (get().pdfRevision ?? 0) + 1
-    set({ pdfData: cloneUint8Array(original), dirty: false, pdfRevision: nextRevision, error: undefined, currentMatchHighlight: null, flashRects: [] })
+    // Undoable, like any other document change.
+    void PDFDocument.load(original, { updateMetadata: false }).then((doc) => {
+      commit(get, set, { pdfData: cloneUint8Array(original), ...pageInfo(doc) })
+      set({ dirty: false, flashRects: [] })
+    })
+  },
+
+  undoDocument: () => {
+    const state = get()
+    const previous = state.docPast.at(-1)
+    const current = snapshotOf(state)
+    if (!previous || !current) return
+    const docPast = state.docPast.slice(0, -1)
+    set({
+      ...previous,
+      docPast,
+      docFuture: [...state.docFuture, current],
+      canUndoDocument: docPast.length > 0,
+      canRedoDocument: true,
+      dirty: true,
+      pdfRevision: (state.pdfRevision ?? 0) + 1,
+      currentMatchHighlight: null,
+    })
+    scheduleAutosave(get)
+  },
+
+  redoDocument: () => {
+    const state = get()
+    const next = state.docFuture.at(-1)
+    const current = snapshotOf(state)
+    if (!next || !current) return
+    const docFuture = state.docFuture.slice(0, -1)
+    set({
+      ...next,
+      docPast: [...state.docPast, current].slice(-MAX_DOC_HISTORY),
+      docFuture,
+      canUndoDocument: true,
+      canRedoDocument: docFuture.length > 0,
+      dirty: true,
+      pdfRevision: (state.pdfRevision ?? 0) + 1,
+      currentMatchHighlight: null,
+    })
+    scheduleAutosave(get)
+  },
+
+  mergeDocuments: async (files: ArrayBuffer[]) => {
+    if (files.length === 0) return
+    await withPdfBytes(get, set, (bytes) => mergePdfs(bytes, files.map((f) => new Uint8Array(f.slice(0)))))
+  },
+
+  extractPagesToBlob: async (selection: string) => {
+    const bytes = get().pdfData
+    if (!bytes) throw new Error('No PDF loaded')
+    const out = await extractPages(bytes, parsePageRanges(selection, get().numPages))
+    return new Blob([out.slice().buffer as ArrayBuffer], { type: 'application/pdf' })
+  },
+
+  addPageNumbers: (opts?: PageNumberOptions) => withPdfBytes(get, set, (bytes) => addPageNumbers(bytes, opts)),
+  addWatermark: (opts: WatermarkOptions) => withPdfBytes(get, set, (bytes) => addWatermark(bytes, opts)),
+  addHeaderFooter: (opts: HeaderFooterOptions) => withPdfBytes(get, set, (bytes) => addHeaderFooter(bytes, opts)),
+
+  getFormFields: async () => {
+    const bytes = get().pdfData
+    return bytes ? readFormFields(bytes) : []
+  },
+
+  fillFormFields: (values: Record<string, FormValue>, opts?: { flatten?: boolean }) =>
+    withPdfBytes(get, set, (bytes) => fillForm(bytes, values, opts)),
+
+  redact: (regions: RedactionRegion[], opts?: { rasterize?: RedactingRasterizer }) =>
+    withPdfBytes(get, set, (bytes) => applyRedactions(bytes, regions, opts)),
+
+  ocrPage: async (pageIndex: number, onProgress?: (p: OcrProgress) => void) => {
+    const bytes = get().pdfData
+    if (!bytes) throw new Error('No PDF loaded')
+    const words = await recognizePage(bytes, pageIndex, { onProgress })
+    if (words.length > 0) await withPdfBytes(get, set, (current) => addInvisibleTextLayer(current, pageIndex, words))
+    return words.length
   },
 
   addBlankPage: async (options?: BlankPageOptions) => {
@@ -495,7 +819,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
 
     const results: TextMatch[] = []
     const readerData = bytes.slice()
-    const pdfReader = await (pdfjsLib as any).getDocument({ data: readerData, disableWorker: disablePdfJsWorker }).promise
+    const pdfReader = await openPdf(readerData)
     try {
       const escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const boundary = wholeWord ? '\\b' : ''
@@ -678,7 +1002,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
         }
       }
     } finally {
-      await pdfReader.destroy()
+      await closePdf(pdfReader)
     }
     debugLog('find', `found ${results.length} total matches for "${searchTerm}"`)
     // Cache for downstream replaceMatch/replaceText
@@ -698,11 +1022,11 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
 
     let replacements = 0
     let skipped = 0
-    const replacementText = replace ?? ''
+    const replacementText = toWinAnsi(replace ?? '')
     await withPdfDocument(get, set, async (doc) => {
       const font = await doc.embedFont(StandardFonts.Helvetica)
       const readerData = get().pdfData?.slice()
-      const pdfReader = readerData ? await (pdfjsLib as any).getDocument({ data: readerData, disableWorker: disablePdfJsWorker }).promise : null
+      const pdfReader = readerData ? await openPdf(readerData) : null
       const pageItemsCache = new Map<number, any[]>()
       const getPageItems = async (pageIndex: number) => {
         if (!pdfReader) return null
@@ -745,8 +1069,8 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
                     const fontSizePts = Math.max(6, Math.abs(d) || Math.abs(a) || item.fontSize || originalFontSize || 12)
                     const reportedWidthPts = typeof item.width === 'number' && item.width > 0
                       ? item.width
-                      : font.widthOfTextAtSize(item.str, fontSizePts)
-                    const measuredWidthPts = font.widthOfTextAtSize(item.str, fontSizePts) || reportedWidthPts
+                      : measureText(font, item.str, fontSizePts)
+                    const measuredWidthPts = measureText(font, item.str, fontSizePts) || reportedWidthPts
                     let widthScale = measuredWidthPts > 0 ? reportedWidthPts / measuredWidthPts : 1
                     widthScale = Math.max(0.8, Math.min(1.25, widthScale))
 
@@ -756,7 +1080,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
                     const offsets: number[] = new Array(item.str.length + 1)
                     offsets[0] = 0
                     for (let i = 0; i < item.str.length; i++) {
-                      const glyphWidth = font.widthOfTextAtSize(item.str[i], fontSizePts)
+                      const glyphWidth = measureText(font, item.str[i], fontSizePts)
                       const normalized = Number.isFinite(glyphWidth) ? glyphWidth : 0
                       offsets[i + 1] = offsets[i] + normalized * widthScale
                     }
@@ -779,7 +1103,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
           }
 
           let drawFontSizePts = Math.max(6, originalFontSize)
-          const baseWidth = replacementText ? font.widthOfTextAtSize(replacementText, drawFontSizePts) : 0
+          const baseWidth = replacementText ? measureText(font, replacementText, drawFontSizePts) : 0
           if (replacementText && baseWidth > selectionWidth * 1.05) {
             const scale = (selectionWidth * 0.98) / Math.max(1, baseWidth)
             if (scale < 0.60) {
@@ -789,7 +1113,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
             }
             drawFontSizePts = Math.max(6, drawFontSizePts * scale)
           }
-          const finalWidth = replacementText ? font.widthOfTextAtSize(replacementText, drawFontSizePts) : 0
+          const finalWidth = replacementText ? measureText(font, replacementText, drawFontSizePts) : 0
 
           const ascenderHeight = font.heightAtSize(originalFontSize, { descender: false })
           const totalHeight = font.heightAtSize(originalFontSize, { descender: true })
@@ -828,7 +1152,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
           try { (get().addFlashRect as any)?.(m.pageIndex, { x: eraseX, y: eraseY, width: eraseW, height: eraseH }) } catch { }
         }
       } finally {
-        try { await pdfReader?.destroy?.() } catch { }
+        try { if (pdfReader) await closePdf(pdfReader) } catch { }
       }
     })
 
@@ -837,6 +1161,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
   },
 
   replaceMatch: async (matchId: string, replace: string) => {
+    replace = toWinAnsi(replace ?? '')
     // Prefer rect-based replacement if the match exists in lastFindResults
     const cached = (get().lastFindResults || []).find((m: any) => m.id === matchId)
     if (cached) {
@@ -856,7 +1181,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
           const bytes = get().pdfData
           if (bytes) {
             const readerData = bytes.slice()
-            const pdfReader = await (pdfjsLib as any).getDocument({ data: readerData, disableWorker: disablePdfJsWorker }).promise
+            const pdfReader = await openPdf(readerData)
             try {
               const pdfjsPage = await pdfReader.getPage(cached.pageIndex + 1)
               const textContent = await pdfjsPage.getTextContent()
@@ -870,8 +1195,8 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
                     const fontSizePts = Math.max(6, Math.abs(d) || Math.abs(a) || item.fontSize || originalFontSize || 12)
                     const reportedWidthPts = typeof item.width === 'number' && item.width > 0
                       ? item.width
-                      : font.widthOfTextAtSize(item.str, fontSizePts)
-                    const measuredWidthPts = font.widthOfTextAtSize(item.str, fontSizePts) || reportedWidthPts
+                      : measureText(font, item.str, fontSizePts)
+                    const measuredWidthPts = measureText(font, item.str, fontSizePts) || reportedWidthPts
                     let widthScale = measuredWidthPts > 0 ? reportedWidthPts / measuredWidthPts : 1
                     widthScale = Math.max(0.8, Math.min(1.25, widthScale))
 
@@ -881,7 +1206,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
                     const offsets: number[] = new Array(item.str.length + 1)
                     offsets[0] = 0
                     for (let i = 0; i < item.str.length; i++) {
-                      const glyphWidth = font.widthOfTextAtSize(item.str[i], fontSizePts)
+                      const glyphWidth = measureText(font, item.str[i], fontSizePts)
                       const normalized = Number.isFinite(glyphWidth) ? glyphWidth : 0
                       offsets[i + 1] = offsets[i] + normalized * widthScale
                     }
@@ -899,13 +1224,13 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
                 }
               }
             } finally {
-              try { await pdfReader.destroy() } catch { }
+              try { await closePdf(pdfReader) } catch { }
             }
           }
         }
 
         let drawFontSizePts = Math.max(6, originalFontSize)
-        const baseWidth = replace ? font.widthOfTextAtSize(replace, drawFontSizePts) : 0
+        const baseWidth = replace ? measureText(font, replace, drawFontSizePts) : 0
         if (replace && baseWidth > selectionWidth * 1.05) {
           const scale = (selectionWidth * 0.98) / Math.max(1, baseWidth)
           if (scale < 0.60) {
@@ -915,7 +1240,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
           drawFontSizePts = Math.max(6, drawFontSizePts * scale)
         }
 
-        const finalWidth = replace ? font.widthOfTextAtSize(replace, drawFontSizePts) : 0
+        const finalWidth = replace ? measureText(font, replace, drawFontSizePts) : 0
 
         const ascenderHeight = font.heightAtSize(originalFontSize, { descender: false })
         const totalHeight = font.heightAtSize(originalFontSize, { descender: true })
@@ -959,7 +1284,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
       const bytes = get().pdfData
       if (!bytes) throw new Error('No PDF loaded')
       const readerData = bytes.slice()
-      const pdfReader = await (pdfjsLib as any).getDocument({ data: readerData, disableWorker: disablePdfJsWorker }).promise
+      const pdfReader = await openPdf(readerData)
       const font = await doc.embedFont(StandardFonts.Helvetica)
       try {
         if (pageIndex < 0 || pageIndex >= doc.getPageCount()) return
@@ -985,15 +1310,15 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
 
         const fontSizePts = Math.max(6, Math.abs(d) || Math.abs(a) || item.fontSize || 12)
         const reportedWidthPts =
-          typeof item.width === 'number' && item.width > 0 ? item.width : font.widthOfTextAtSize(item.str, fontSizePts)
-        const measuredWidthPts = font.widthOfTextAtSize(item.str, fontSizePts) || reportedWidthPts
+          typeof item.width === 'number' && item.width > 0 ? item.width : measureText(font, item.str, fontSizePts)
+        const measuredWidthPts = measureText(font, item.str, fontSizePts) || reportedWidthPts
         let widthScale = measuredWidthPts > 0 ? reportedWidthPts / measuredWidthPts : 1
         widthScale = Math.max(0.8, Math.min(1.25, widthScale))
 
         const offsets: number[] = new Array(item.str.length + 1)
         offsets[0] = 0
         for (let i = 0; i < item.str.length; i++) {
-          const glyphWidth = font.widthOfTextAtSize(item.str[i], fontSizePts)
+          const glyphWidth = measureText(font, item.str[i], fontSizePts)
           const normalized = Number.isFinite(glyphWidth) ? glyphWidth : 0
           offsets[i + 1] = offsets[i] + normalized * widthScale
         }
@@ -1003,14 +1328,14 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
         const selectionWidth = Math.max(0, endOffset - startOffset)
         if (!Number.isFinite(selectionWidth) || selectionWidth <= 0) return
 
-        const baseReplacementWidth = replace ? font.widthOfTextAtSize(replace, fontSizePts) * widthScale : 0
+        const baseReplacementWidth = replace ? measureText(font, replace, fontSizePts) * widthScale : 0
         let drawFontSizePts = fontSizePts
         if (replace && baseReplacementWidth > selectionWidth) {
           const scaleFactor = selectionWidth / baseReplacementWidth
           if (scaleFactor < 0.85) return
           drawFontSizePts = Math.max(6, fontSizePts * scaleFactor)
         }
-        const replacementActualWidth = replace ? font.widthOfTextAtSize(replace, drawFontSizePts) : 0
+        const replacementActualWidth = replace ? measureText(font, replace, drawFontSizePts) : 0
 
         const baselineX = e + startOffset
         const baselineY = f
@@ -1034,8 +1359,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
         replaced = true
         try { (get().addFlashRect as any)?.(pageIndex, { x: baselineX, y: rectY, width: eraseWidth, height: rectHeight }) } catch { }
       } finally {
-        // @ts-ignore
-        await pdfReader.destroy()
+        await closePdf(pdfReader)
       }
     })
 
@@ -1054,9 +1378,19 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
     return { replaced, reason }
   },
 
-  flattenAnnotations: async (annotations: Annotation[]) => {
+  flattenAnnotations: async (annotations: Annotation[], opts?: { rasterize?: RedactingRasterizer }) => {
     if (!annotations.length) return
-    await withPdfDocument(get, set, async (doc) => {
+    const regions: RedactionRegion[] = annotations
+      .filter((ann) => ann.type === 'redaction')
+      .map((ann) => {
+        const x0 = Math.min(ann.startX, ann.endX ?? ann.startX)
+        const y0 = Math.min(ann.startY, ann.endY ?? ann.startY)
+        return { page: ann.page - 1, x: x0, y: y0, w: Math.abs((ann.endX ?? ann.startX) - ann.startX), h: Math.abs((ann.endY ?? ann.startY) - ann.startY) }
+      })
+    // One history step for the whole flatten, redactions included.
+    await withPdfBytes(get, set, async (sourceBytes) => {
+      const redacted = regions.length ? await applyRedactions(sourceBytes, regions, opts) : sourceBytes
+      const doc = await PDFDocument.load(redacted, { updateMetadata: false })
       const pages = doc.getPages()
       const font = await doc.embedFont(StandardFonts.Helvetica)
 
@@ -1133,7 +1467,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
             if (!ann.text) break
             const fontSize = ann.fontSize ?? 16
             const baselineY = pageHeight - startYTop
-            page.drawText(ann.text, {
+            page.drawText(toWinAnsi(ann.text), {
               x: startX,
               y: baselineY,
               size: fontSize,
@@ -1165,7 +1499,7 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
               let cursorY = stickyRect.y + stickyRect.height - textMargin - fontSize
               lines.forEach((line) => {
                 if (cursorY < stickyRect.y + textMargin) return
-                const truncated = line.length > 0 ? line : ' '
+                const truncated = line.length > 0 ? toWinAnsi(line) : ' '
                 page.drawText(truncated, {
                   x: stickyRect.x + textMargin,
                   y: cursorY,
@@ -1180,18 +1514,22 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
             break
           }
           case 'stamp': {
-            const fontSize = Math.max(20, (ann.fontSize ?? 24))
-            const baselineY = pageHeight - startYTop
+            const borderWidth = Math.max(2, (ann.strokeWidth ?? 3) * 0.8)
             page.drawRectangle({
               ...rect,
               borderColor: rgb(color.r, color.g, color.b),
-              borderWidth: Math.max(2, (ann.strokeWidth ?? 3) * 0.8),
-              opacity,
+              borderWidth,
+              borderOpacity: opacity,
+              opacity: 0,
             })
-            if (ann.text) {
-              page.drawText(ann.text.toUpperCase(), {
-                x: rect.x + 12,
-                y: baselineY,
+            const label = toWinAnsi(ann.text || 'APPROVED').toUpperCase()
+            // Fit the label inside the box, centred.
+            const fontSize = Math.min(rect.height * 0.6, (rect.width - borderWidth * 4) / Math.max(0.01, font.widthOfTextAtSize(label, 1)))
+            if (fontSize >= 4) {
+              const textWidth = font.widthOfTextAtSize(label, fontSize)
+              page.drawText(label, {
+                x: rect.x + (rect.width - textWidth) / 2,
+                y: rect.y + (rect.height - fontSize * 0.72) / 2,
                 size: fontSize,
                 font,
                 color: rgb(color.r, color.g, color.b),
@@ -1200,6 +1538,44 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
             }
             break
           }
+          case 'underline':
+          case 'strikethrough': {
+            const y = ann.type === 'underline' ? rect.y : rect.y + rect.height / 2
+            page.drawLine({
+              start: { x: rect.x, y },
+              end: { x: rect.x + rect.width, y },
+              color: rgb(color.r, color.g, color.b),
+              thickness: Math.max(1, (ann.strokeWidth ?? 2) * 0.75),
+              opacity,
+            })
+            break
+          }
+          case 'ellipse': {
+            page.drawEllipse({
+              x: rect.x + rect.width / 2,
+              y: rect.y + rect.height / 2,
+              xScale: rect.width / 2,
+              yScale: rect.height / 2,
+              borderColor: rgb(color.r, color.g, color.b),
+              borderWidth: Math.max(1, (ann.strokeWidth ?? 2) * 0.75),
+              borderOpacity: opacity,
+            })
+            break
+          }
+          case 'arrow': {
+            const thickness = Math.max(1, (ann.strokeWidth ?? 2) * 0.75)
+            const line = { color: rgb(color.r, color.g, color.b), thickness, opacity }
+            const tail = { x: startX, y: pageHeight - startYTop }
+            const tip = { x: endX, y: pageHeight - endYTop }
+            page.drawLine({ start: tail, end: tip, ...line })
+            for (const [wx, wy] of arrowHeadWings(tail, tip, Math.max(8, thickness * 4))) {
+              page.drawLine({ start: tip, end: { x: wx, y: wy }, ...line })
+            }
+            break
+          }
+          case 'redaction':
+            // Already applied above by applyRedactions.
+            break
           case 'signature': {
             if (!ann.imageDataUrl) break
             const decoded = decodeDataUrl(ann.imageDataUrl)
@@ -1224,16 +1600,20 @@ export const usePdfEditorStore = create<PdfEditorState>((set: any, get: any) => 
           }
         }
       }
+      return doc.save()
     })
   },
 
-  exportPdf: async () => {
+  exportPdf: async (opts?: { password?: string }) => {
     const bytes = get().pdfData
     if (!bytes) {
       throw new Error('No PDF loaded')
     }
-    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
-    return new Blob([buffer], { type: 'application/pdf' })
+    // Never hand out a file the user believes is redacted when it is not.
+    const pending = useAnnotationStore.getState().annotations.filter((a) => a.type === 'redaction' && !a.isDeleted)
+    if (pending.length) throw new PendingRedactionsError(pending.length)
+    const out = opts?.password ? await encryptPdf(bytes, { userPassword: opts.password }) : bytes
+    return new Blob([out.slice().buffer as ArrayBuffer], { type: 'application/pdf' })
   },
 
   clearError: () => set({ error: undefined }),

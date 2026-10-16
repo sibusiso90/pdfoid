@@ -1,5 +1,4 @@
-﻿// @ts-ignore
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
+import { closePdf, openPdf } from '../lib/pdfjs'
 import type {
   CVCertification,
   CVData,
@@ -10,13 +9,6 @@ import type {
   CVSkill,
 } from '../types/cv'
 import { createEmptyCVData } from '../types/cv'
-
-if ((pdfjsLib as any).GlobalWorkerOptions) {
-  ; (pdfjsLib as any).GlobalWorkerOptions.workerSrc =
-    'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
-}
-
-const disablePdfJsWorker = import.meta.env?.VITE_PDFJS_DISABLE_WORKER === '1'
 
 export const MIN_CV_PARSE_CONFIDENCE = 0.45
 export const MAX_CV_PARSE_PAGES = 8
@@ -344,10 +336,7 @@ const extractLinesFromPdf = async (
   bytes: Uint8Array,
   maxPages: number
 ): Promise<{ lines: ParsedLine[]; pagesScanned: number }> => {
-  const reader = await (pdfjsLib as any).getDocument({
-    data: bytes.slice(),
-    disableWorker: disablePdfJsWorker,
-  }).promise
+  const reader = await openPdf(bytes)
   const pagesScanned = Math.min(maxPages, reader.numPages || maxPages)
   const items: LineItem[] = []
 
@@ -366,7 +355,7 @@ const extractLinesFromPdf = async (
   }
 
   try {
-    await reader.destroy()
+    await closePdf(reader)
   } catch {
     // Ignore cleanup errors.
   }

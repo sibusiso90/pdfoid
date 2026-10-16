@@ -60,14 +60,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       // Default error UI
       return (
         <div 
-          className="flex flex-col items-center justify-center min-h-[400px] p-8 bg-gray-50"
+          className="flex flex-col items-center justify-center min-h-96 p-8 bg-[var(--pdfoid-bg)]"
           role="alert"
           aria-live="assertive"
         >
           <div className="max-w-md text-center">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-[var(--pdfoid-danger-soft)] rounded-2xl flex items-center justify-center mx-auto mb-6">
               <svg 
-                className="w-10 h-10 text-red-500" 
+                className="w-10 h-10 text-[var(--pdfoid-danger)]" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -82,20 +82,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </svg>
             </div>
             
-            <h2 className="text-xl font-bold text-gray-800 mb-2">
+            <h2 className="text-xl font-semibold text-[var(--pdfoid-text)] mb-2">
               Something went wrong
             </h2>
             
-            <p className="text-gray-600 mb-6">
+            <p className="text-[var(--pdfoid-muted)] mb-6">
               We encountered an unexpected error. Please try again or refresh the page.
             </p>
 
             {this.state.error && (
               <details className="mb-6 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                <summary className="text-sm text-[var(--pdfoid-muted)] cursor-pointer hover:text-[var(--pdfoid-text)]">
                   Show error details
                 </summary>
-                <pre className="mt-2 p-3 bg-gray-100 rounded-lg text-xs text-red-600 overflow-auto max-h-48">
+                <pre className="mt-2 p-3 bg-[var(--pdfoid-surface-2)] rounded-lg text-xs text-[var(--pdfoid-danger)] overflow-auto max-h-48">
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
                 </pre>

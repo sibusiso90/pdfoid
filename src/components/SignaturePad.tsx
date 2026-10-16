@@ -47,26 +47,26 @@ export function SignaturePad({ onSave, onCancel }: SignaturePadProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
-            <div className="w-[min(92vw,520px)] rounded-xl bg-white shadow-xl border border-gray-200 p-4" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in" onClick={onCancel}>
+            <div className="w-[min(92vw,520px)] rounded-2xl bg-[var(--pdfoid-surface)] shadow-[var(--pdfoid-shadow)] border border-[var(--pdfoid-border)] p-5 animate-scale-in" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-bold text-gray-900">Create signature</h3>
-                    <button className="text-sm text-gray-500 hover:text-gray-900" onClick={onCancel} type="button">
+                    <h3 className="text-base font-semibold text-[var(--pdfoid-text)]">Create signature</h3>
+                    <button className="text-sm text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)]" onClick={onCancel} type="button">
                         Close
                     </button>
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg">
+                <div className="flex gap-2 mb-4 bg-[var(--pdfoid-surface-2)] p-1 rounded-lg">
                     <button
                         onClick={() => setMode('draw')}
-                        className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${mode === 'draw' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`flex-1 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${mode === 'draw' ? 'bg-[var(--pdfoid-surface)] shadow-sm text-[var(--pdfoid-text)]' : 'text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)]'}`}
                     >
                         Draw
                     </button>
                     <button
                         onClick={() => setMode('type')}
-                        className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${mode === 'type' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`flex-1 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${mode === 'type' ? 'bg-[var(--pdfoid-surface)] shadow-sm text-[var(--pdfoid-text)]' : 'text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)]'}`}
                     >
                         Type
                     </button>
@@ -75,7 +75,7 @@ export function SignaturePad({ onSave, onCancel }: SignaturePadProps) {
                 {mode === 'type' ? (
                     <div className="space-y-3">
                         <input
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full rounded-lg border border-[var(--pdfoid-border-strong)] bg-[var(--pdfoid-surface-2)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--pdfoid-ring)]"
                             placeholder="Type your name"
                             value={typedSignature}
                             onChange={(e) => setTypedSignature(e.target.value)}
@@ -92,7 +92,7 @@ export function SignaturePad({ onSave, onCancel }: SignaturePadProps) {
                             ref={drawCanvasRef}
                             width={480}
                             height={180}
-                            className="w-full rounded-lg border border-gray-200 bg-white touch-none"
+                            className="w-full rounded-lg border border-[var(--pdfoid-border)] bg-white touch-none"
                             onMouseDown={(e) => {
                                 const canvas = drawCanvasRef.current;
                                 if (!canvas) return;

@@ -8,7 +8,7 @@ const toPdfItems = (lines: string[]) =>
     transform: [12, 0, 0, 12, 72, 760 - index * 16],
   }))
 
-vi.mock('pdfjs-dist/legacy/build/pdf.js', () => ({
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
   getDocument: vi.fn(() => ({
     promise: Promise.resolve({
       get numPages() {
@@ -21,10 +21,12 @@ vi.mock('pdfjs-dist/legacy/build/pdf.js', () => ({
               items: toPdfItems(mockPdfPages[page - 1] || []),
             }),
         }),
-      destroy: vi.fn(),
+      loadingTask: { destroy: vi.fn(async () => {}) },
     }),
   })),
   GlobalWorkerOptions: { workerSrc: '' },
+    PasswordException: class extends Error {},
+    PasswordResponses: { NEED_PASSWORD: 1, INCORRECT_PASSWORD: 2 },
 }))
 
 import { extractCVDataFromPdf, MIN_CV_PARSE_CONFIDENCE } from '../utils/cvExtractor'

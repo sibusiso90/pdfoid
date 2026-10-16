@@ -1,18 +1,70 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease-out-soft: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ============================================
+   DESIGN TOKENS
+   One neutral gray family, one accent.
+   ============================================ */
+
 :root {
-  --pdfoid-bg: #eef1f4;
+  color-scheme: light;
+  --pdfoid-bg: #f4f4f5;
+  --pdfoid-canvas: #ebebec;
   --pdfoid-surface: #ffffff;
-  --pdfoid-surface-2: #e5e9ee;
-  --pdfoid-border: rgba(15, 23, 42, 0.14);
-  --pdfoid-text: #111827;
-  --pdfoid-muted: #667085;
+  --pdfoid-surface-2: #f4f4f5;
+  --pdfoid-hover: rgba(24, 24, 27, 0.05);
+  --pdfoid-pressed: rgba(24, 24, 27, 0.09);
+  --pdfoid-border: rgba(24, 24, 27, 0.09);
+  --pdfoid-border-strong: rgba(24, 24, 27, 0.16);
+  --pdfoid-text: #18181b;
+  --pdfoid-muted: #71717a;
+  --pdfoid-subtle: #a1a1aa;
   --pdfoid-accent: #2457d6;
   --pdfoid-accent-hover: #1d49b8;
   --pdfoid-accent-active: #173b94;
   --pdfoid-accent2: #2457d6;
-  --pdfoid-accent-soft: rgba(36, 87, 214, 0.12);
-  --pdfoid-ring: rgba(36, 87, 214, 0.46);
+  --pdfoid-accent-soft: rgba(36, 87, 214, 0.1);
+  --pdfoid-on-accent: #ffffff;
+  --pdfoid-danger: #c8312b;
+  --pdfoid-danger-soft: rgba(200, 49, 43, 0.08);
+  --pdfoid-success: #1f8a4c;
+  --pdfoid-ring: rgba(36, 87, 214, 0.42);
+  --pdfoid-shadow: 0 1px 2px rgba(24, 24, 27, 0.06), 0 8px 24px -8px rgba(24, 24, 27, 0.14);
+  --pdfoid-shadow-page: 0 1px 3px rgba(24, 24, 27, 0.08), 0 12px 32px -12px rgba(24, 24, 27, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --pdfoid-bg: #181818;
+    --pdfoid-canvas: #131313;
+    --pdfoid-surface: #1f1f1f;
+    --pdfoid-surface-2: #272727;
+    --pdfoid-hover: rgba(255, 255, 255, 0.06);
+    --pdfoid-pressed: rgba(255, 255, 255, 0.1);
+    --pdfoid-border: rgba(255, 255, 255, 0.08);
+    --pdfoid-border-strong: rgba(255, 255, 255, 0.16);
+    --pdfoid-text: #f4f4f5;
+    --pdfoid-muted: #a1a1aa;
+    --pdfoid-subtle: #71717a;
+    --pdfoid-accent: #7ea2ff;
+    --pdfoid-accent-hover: #93b1ff;
+    --pdfoid-accent-active: #a8c0ff;
+    --pdfoid-accent2: #7ea2ff;
+    --pdfoid-accent-soft: rgba(126, 162, 255, 0.14);
+    --pdfoid-on-accent: #0f1530;
+    --pdfoid-danger: #f07167;
+    --pdfoid-danger-soft: rgba(240, 113, 103, 0.12);
+    --pdfoid-success: #5fd08f;
+    --pdfoid-ring: rgba(126, 162, 255, 0.55);
+    --pdfoid-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+    --pdfoid-shadow-page: 0 1px 3px rgba(0, 0, 0, 0.5), 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+  }
 }
 
 html,
@@ -26,9 +78,8 @@ body,
 body {
   background: var(--pdfoid-bg);
   color: var(--pdfoid-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -37,61 +88,32 @@ body {
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
 }
 
 /* ============================================
-   RESPONSIVE UTILITIES
+   SCROLLBARS
    ============================================ */
 
-/* Hide on mobile, show on tablet+ */
-@media (max-width: 767px) {
-  .hide-mobile {
-    display: none !important;
-  }
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pdfoid-border-strong) transparent;
 }
 
-/* Hide on tablet+, show on mobile */
-@media (min-width: 768px) {
-  .hide-desktop {
-    display: none !important;
-  }
-}
-
-/* Touch-friendly minimum sizes */
-.touch-target {
-  min-width: 44px;
-  min-height: 44px;
-}
-
-/* ============================================
-   SCROLLBAR STYLING
-   ============================================ */
-
-/* Custom scrollbar styling */
-.custom-scrollbar::-webkit-scrollbar {
+.scrollbar-thin::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(47, 33, 22, 0.06);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(139, 94, 52, 0.35);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 94, 52, 0.5);
-}
-
-/* Thin scrollbar for sidebars */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -99,23 +121,90 @@ pre {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(47, 33, 22, 0.18);
-  border-radius: 4px;
+  background: var(--pdfoid-border-strong);
+  border-radius: 9999px;
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(47, 33, 22, 0.3);
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   CONTROLS
+   ============================================ */
+
+/* Compact range input that matches the token palette */
+.range {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 16px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--pdfoid-border-strong);
+}
+
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--pdfoid-border-strong);
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 9999px;
+  background: var(--pdfoid-surface);
+  border: 1px solid var(--pdfoid-border-strong);
+  box-shadow: 0 1px 3px rgba(24, 24, 27, 0.25);
+  transition: transform 200ms var(--ease-out-soft);
+}
+
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--pdfoid-surface);
+  border: 1px solid var(--pdfoid-border-strong);
+  box-shadow: 0 1px 3px rgba(24, 24, 27, 0.25);
+}
+
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.range:focus-visible {
+  outline: none;
+}
+
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--pdfoid-ring);
+}
+
+/* Subtle paper grain on the canvas well so it never reads as flat gray */
+.canvas-grain {
+  background-color: var(--pdfoid-canvas);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ============================================
    ANIMATIONS
    ============================================ */
 
-/* Subtle fade-in animation for keywords */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
 
   to {
@@ -127,7 +216,7 @@ pre {
 @keyframes slideInFromRight {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(16px);
   }
 
   to {
@@ -136,22 +225,20 @@ pre {
   }
 }
 
-@keyframes slideInFromLeft {
+@keyframes slideUp {
   from {
-    opacity: 0;
-    transform: translateX(-100%);
+    transform: translateY(100%);
   }
 
   to {
-    opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.97);
   }
 
   to {
@@ -160,223 +247,42 @@ pre {
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 
-  100% {
-    background-position: 200% 0;
+  to {
+    opacity: 1;
   }
 }
 
-/* Animation classes */
 .animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out forwards;
+  animation: fadeInUp 400ms var(--ease-out-soft) both;
 }
 
 .animate-slide-in-right {
-  animation: slideInFromRight 0.3s ease-out forwards;
+  animation: slideInFromRight 400ms var(--ease-out-soft) both;
 }
 
-.animate-slide-in-left {
-  animation: slideInFromLeft 0.3s ease-out forwards;
+.animate-slide-up {
+  animation: slideUp 500ms var(--ease-out-soft) both;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.2s ease-out forwards;
+  animation: scaleIn 300ms var(--ease-out-soft) both;
 }
 
-/* Staggered animation delays */
-.stagger-1 {
-  animation-delay: 0.05s;
-}
-
-.stagger-2 {
-  animation-delay: 0.1s;
-}
-
-.stagger-3 {
-  animation-delay: 0.15s;
-}
-
-.stagger-4 {
-  animation-delay: 0.2s;
-}
-
-.stagger-5 {
-  animation-delay: 0.25s;
-}
-
-/* ============================================
-   MICRO-INTERACTIONS
-   ============================================ */
-
-/* Button press effect */
-.btn-press {
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.btn-press:active {
-  transform: scale(0.97);
-}
-
-/* Hover lift effect */
-.hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Focus ring for accessibility */
-.focus-ring {
-  outline: none;
-}
-
-.focus-ring:focus-visible {
-  outline: 2px solid var(--pdfoid-ring);
-  outline-offset: 2px;
-}
-
-/* Smooth color transitions */
-.color-transition {
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-}
-
-/* ============================================
-   MOBILE DRAWER / OVERLAY
-   ============================================ */
-
-.drawer-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 40;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.drawer-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.drawer-panel {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  max-width: 320px;
-  background: white;
-  z-index: 50;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  overflow-y: auto;
-}
-
-.drawer-panel.right {
-  right: 0;
-  left: auto;
-  transform: translateX(100%);
-}
-
-.drawer-panel.open {
-  transform: translateX(0);
-}
-
-/* ============================================
-   RESPONSIVE TOOLBAR
-   ============================================ */
-
-/* Compact toolbar for mobile */
-@media (max-width: 767px) {
-  .toolbar-compact {
-    padding: 0.5rem;
-    gap: 0.25rem;
-  }
-
-  .toolbar-compact button {
-    padding: 0.5rem;
-    font-size: 0.75rem;
-  }
-}
-
-/* ============================================
-   GLASSMORPHISM EFFECTS
-   ============================================ */
-
-.glass {
-  background: rgba(255, 250, 242, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* ============================================
-   LOADING STATES
-   ============================================ */
-
-.skeleton {
-  background: linear-gradient(90deg,
-      #f0f0f0 25%,
-      #e0e0e0 50%,
-      #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* ============================================
-   RESPONSIVE TYPOGRAPHY
-   ============================================ */
-
-/* Fluid typography */
-.text-fluid-sm {
-  font-size: clamp(0.75rem, 2vw, 0.875rem);
-}
-
-.text-fluid-base {
-  font-size: clamp(0.875rem, 2.5vw, 1rem);
-}
-
-.text-fluid-lg {
-  font-size: clamp(1rem, 3vw, 1.25rem);
-}
-
-.text-fluid-xl {
-  font-size: clamp(1.25rem, 4vw, 1.5rem);
-}
-
-.text-fluid-2xl {
-  font-size: clamp(1.5rem, 5vw, 2rem);
+.animate-fade-in {
+  animation: fadeIn 300ms var(--ease-out-soft) both;
 }
 
 /* ============================================
    SAFE AREA (NOTCH) SUPPORT
    ============================================ */
 
-.safe-top {
-  padding-top: env(safe-area-inset-top);
-}
-
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
-}
-
-.safe-left {
-  padding-left: env(safe-area-inset-left);
-}
-
-.safe-right {
-  padding-right: env(safe-area-inset-right);
 }
 
 /* ============================================
@@ -393,5 +299,3 @@ pre {
     transition-duration: 0.01ms !important;
   }
 }
-@media (prefers-color-scheme: dark){:root{--pdfoid-bg:#111418;--pdfoid-surface:#181d23;--pdfoid-surface-2:#222933;--pdfoid-border:rgba(255,255,255,.14);--pdfoid-text:#f5f7fa;--pdfoid-muted:#a4afbd;--pdfoid-accent:#6f98ff;--pdfoid-accent-hover:#89aaff;--pdfoid-accent-active:#a2bbff;--pdfoid-accent2:#6f98ff;--pdfoid-accent-soft:rgba(111,152,255,.14);--pdfoid-ring:rgba(111,152,255,.55)}.drawer-panel{background:var(--pdfoid-surface)}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

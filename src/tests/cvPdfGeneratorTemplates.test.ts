@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { createHash } from 'crypto'
 import { generateCVPDF } from '../utils/cvPdfGenerator'
 import { createEmptyCVData, defaultCVSettings, type CVData, type CVTemplate } from '../types/cv'
 
@@ -61,7 +60,8 @@ const fixtureCVData = (): CVData => ({
   ],
 })
 
-const toDigest = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex')
+const toDigest = async (bytes: Uint8Array) =>
+  Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes.slice())), (b) => b.toString(16).padStart(2, '0')).join('')
 
 describe('cvPdfGenerator templates', () => {
   it('renders all four templates and produces distinct outputs', async () => {
@@ -74,7 +74,7 @@ describe('cvPdfGenerator templates', () => {
         template,
       })
       expect(bytes.length).toBeGreaterThan(1200)
-      digests.add(toDigest(bytes))
+      digests.add(await toDigest(bytes))
     }
 
     expect(digests.size).toBe(templateIds.length)

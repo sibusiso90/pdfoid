@@ -31,24 +31,24 @@ const toastIcons: Record<ToastType, React.ReactNode> = {
 
 const toastStyles: Record<ToastType, { bg: string; border: string; icon: string }> = {
   success: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    icon: 'text-emerald-500',
+    bg: 'bg-[var(--pdfoid-surface)]',
+    border: 'border-[var(--pdfoid-border)]',
+    icon: 'text-[var(--pdfoid-success)]',
   },
   error: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    icon: 'text-red-500',
+    bg: 'bg-[var(--pdfoid-surface)]',
+    border: 'border-[var(--pdfoid-border)]',
+    icon: 'text-[var(--pdfoid-danger)]',
   },
   warning: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
+    bg: 'bg-[var(--pdfoid-surface)]',
+    border: 'border-[var(--pdfoid-border)]',
     icon: 'text-amber-500',
   },
   info: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    icon: 'text-blue-500',
+    bg: 'bg-[var(--pdfoid-surface)]',
+    border: 'border-[var(--pdfoid-border)]',
+    icon: 'text-[var(--pdfoid-accent)]',
   },
 };
 
@@ -69,24 +69,22 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose, index }) => {
       style={{ animationDelay: `${index * 50}ms` }}
       className={`
         ${styles.bg} ${styles.border}
-        border rounded-xl shadow-lg
-        p-4 max-w-sm w-full
+        border rounded-xl shadow-[var(--pdfoid-shadow)]
+        px-3 py-2.5 max-w-sm w-full
         animate-slide-in-right
-        transition-all duration-300 ease-out
-        hover:shadow-xl hover:-translate-y-0.5
       `}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2.5">
         {/* Icon */}
-        <div className={`shrink-0 ${styles.icon}`}>
+        <div className={`shrink-0 mt-px ${styles.icon}`}>
           {toastIcons[toast.type]}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900">{toast.message}</p>
+          <p className="text-sm font-medium text-[var(--pdfoid-text)]">{toast.message}</p>
           {toast.description && (
-            <p className="mt-1 text-xs text-gray-600">{toast.description}</p>
+            <p className="mt-1 text-xs text-[var(--pdfoid-muted)]">{toast.description}</p>
           )}
           {toast.action && (
             <button
@@ -94,7 +92,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose, index }) => {
                 toast.action?.onClick();
                 onClose();
               }}
-              className="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-700 focus:outline-none focus:underline"
+              className="mt-1 text-sm font-semibold text-[var(--pdfoid-accent)] hover:underline underline-offset-4 focus:outline-none focus-visible:underline"
             >
               {toast.action.label}
             </button>
@@ -104,7 +102,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose, index }) => {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="shrink-0 p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+          className="shrink-0 p-1 rounded-lg text-[var(--pdfoid-subtle)] hover:text-[var(--pdfoid-text)] hover:bg-[var(--pdfoid-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--pdfoid-ring)]"
           aria-label="Dismiss notification"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -124,7 +122,7 @@ export const ToastContainer: React.FC = () => {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm"
+      className="fixed top-16 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 flex flex-col items-center gap-2 sm:w-96"
       aria-label="Notifications"
     >
       {toasts.map((toast, index) => (

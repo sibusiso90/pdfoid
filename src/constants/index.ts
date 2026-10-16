@@ -11,7 +11,6 @@ export const PDF_CONFIG = {
   MAX_SCALE: 3,
   DEFAULT_SCALE: 1.5,
   SCALE_STEP: 0.25,
-  WORKER_URL: 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
 } as const;
 
 /**

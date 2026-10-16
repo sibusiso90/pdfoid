@@ -6,6 +6,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { drawShape, isCanvasShape } from './annotationShapes';
 import { useAnnotationStore } from '../store/annotationStore';
 import { Annotation, AnnotationType } from '../types/annotations';
 import { usePdfEditorStore } from '../store/pdfEditorStore';
@@ -78,6 +79,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
     getAnnotationById,
     setSelectedAnnotation,
     selectedFontSize,
+    selectedStampText,
   } = useAnnotationStore();
 
   const warning = useUIStore((s) => s.warning);
@@ -546,6 +548,15 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
       case 'rectangle': {
         const r = rectFrom(x1, y1, x2, y2);
         ctx.strokeRect(r.left, r.top, r.width, r.height);
+        break;
+      }
+      case 'underline':
+      case 'strikethrough':
+      case 'ellipse':
+      case 'arrow':
+      case 'stamp':
+      case 'redaction': {
+        drawShape(ctx, annotation.type, x1, y1, x2, y2, annotation.text);
         break;
       }
       case 'pen': {
@@ -1181,6 +1192,8 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
     } else if (tool === 'rectangle') {
       const r = rectFrom(startX, startY, x, y);
       previewCtx.strokeRect(r.left, r.top, r.width, r.height);
+    } else if (isCanvasShape(tool)) {
+      drawShape(previewCtx, tool, startX, startY, x, y, selectedStampText);
     } else if (tool === 'signature') {
       if (signatureDataUrl) {
         const img = getCachedImage(signatureDataUrl);
@@ -1350,6 +1363,7 @@ export const AnnotationCanvas: React.FC<AnnotationCanvasProps> = ({
           strokeWidth: selectedThickness,
           opacity: selectedOpacity,
           points: finalPoints,
+          text: tool === 'stamp' ? selectedStampText : undefined,
         };
 
         addAnnotation(annotation);

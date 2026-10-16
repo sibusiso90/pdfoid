@@ -101,14 +101,16 @@ const mockGetPage = vi.fn(() => Promise.resolve({
 const mockPdfDoc = {
     numPages: 5,
     getPage: mockGetPage,
-    destroy: vi.fn(),
+    loadingTask: { destroy: vi.fn(async () => {}) },
 }
 
-vi.mock('pdfjs-dist/legacy/build/pdf.js', () => ({
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
     getDocument: vi.fn(() => ({
         promise: Promise.resolve(mockPdfDoc)
     })),
     GlobalWorkerOptions: { workerSrc: '' },
+    PasswordException: class extends Error {},
+    PasswordResponses: { NEED_PASSWORD: 1, INCORRECT_PASSWORD: 2 },
 }))
 
 // 4. Props

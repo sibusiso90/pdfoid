@@ -248,7 +248,7 @@ test('annotation tools: draw, edit, and erase', async ({ page }) => {
   await signatureModal.getByPlaceholder('Type your name').fill('Ada Lovelace')
   await signatureModal.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Create signature' })).toHaveCount(0)
-  const sigPoint = await canvasPoint(canvas, 0.2, 0.7)
+  const sigPoint = await canvasPoint(canvas, 0.78, 0.42)
   await page.mouse.click(sigPoint.x, sigPoint.y)
   await expect(page.locator('[id^="annotation-item-"]', { hasText: 'Signature' })).toBeVisible()
 

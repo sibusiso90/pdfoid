@@ -3,7 +3,22 @@
  * Follows DEEPWIKI annotation persistence model
  */
 
-export type AnnotationType = 'highlight' | 'pen' | 'rectangle' | 'text-box' | 'sticky-note' | 'stamp' | 'signature';
+export type AnnotationType =
+  | 'highlight'
+  | 'underline'
+  | 'strikethrough'
+  | 'pen'
+  | 'rectangle'
+  | 'ellipse'
+  | 'arrow'
+  | 'text-box'
+  | 'sticky-note'
+  | 'stamp'
+  | 'signature'
+  /** Marks an area for true redaction; applied (rasterized) on flatten/export. */
+  | 'redaction';
+
+export const STAMP_PRESETS = ['APPROVED', 'DRAFT', 'CONFIDENTIAL', 'REVIEWED', 'REJECTED'] as const;
 export type ToolType = AnnotationType | 'eraser' | 'pointer';
 
 export interface Annotation {
@@ -48,6 +63,8 @@ export interface AnnotationState {
   selectedThickness: number;
   selectedOpacity: number;
   selectedFontSize: number;
+  /** Text placed by the stamp tool. */
+  selectedStampText: string;
   signatureDataUrl?: string;
   signatureMime?: string;
   currentPage: number;

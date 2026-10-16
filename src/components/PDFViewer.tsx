@@ -1,17 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
+import { openPdf, type PDFDocumentProxy, type RenderTask } from '../lib/pdfjs'
 import { AnnotationCanvas } from './AnnotationCanvas'
-
-// Ensure workerSrc is set without reassigning import bindings
-if ((pdfjsLib as any).GlobalWorkerOptions) {
-  ; (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
-}
+import { ArrowsOutLineHorizontal, CaretLeft, CaretRight, CornersOut, Minus, Plus, WarningCircle } from '@phosphor-icons/react'
 
 export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfData: ArrayBuffer; onPageChange?: (page: number) => void; targetPage?: number }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const renderTaskRef = useRef<any | null>(null)
-  const [pdf, setPdf] = useState<any | null>(null)
+  const renderTaskRef = useRef<RenderTask | null>(null)
+  const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null)
   const [pageNum, setPageNum] = useState(1)
   const [scale, setScale] = useState(1.5)
   const [numPages, setNumPages] = useState(0)
@@ -26,15 +22,12 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
     ? pageSize
     : e2eFallbackSize
 
-  const disableWorker = import.meta.env?.VITE_PDFJS_DISABLE_WORKER === '1'
-
   useEffect(() => {
     let cancelled = false
       ; (async () => {
         try {
           setError(null)
-          const dataCopy = new Uint8Array(pdfData.slice(0))
-          const doc = await (pdfjsLib as any).getDocument({ data: dataCopy, disableWorker }).promise
+          const doc = await openPdf(pdfData)
           if (cancelled) return
           setPdf(doc)
           setNumPages(doc.numPages)
@@ -66,13 +59,7 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
           setError(null)
 
           // Cancel previous render task if still running
-          if (renderTaskRef.current) {
-            try {
-              await renderTaskRef.current.cancel()
-            } catch {
-              // ignore cancellation errors
-            }
-          }
+          renderTaskRef.current?.cancel()
 
           // Cleanup previous page resources (textures, etc.)
           // This is critical for preventing memory leaks on long documents
@@ -135,7 +122,7 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
             ctx.scale(dpr, dpr);
           }
 
-          const renderContext: any = { canvasContext: ctx, viewport }
+          const renderContext = { canvas, canvasContext: ctx, viewport }
           // Note: We don't use the 'transform' property of renderContext here because
           // we scaled the ctx directly. This is often more reliable for annotations.
 
@@ -160,12 +147,8 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
     return () => {
       isActive = false
       if (renderTaskRef.current) {
-        // Guard against cancel() not being a function or not returning a promise
         try {
-          const cancelResult = renderTaskRef.current.cancel?.()
-          if (cancelResult && typeof cancelResult.catch === 'function') {
-            cancelResult.catch(() => { })
-          }
+          renderTaskRef.current.cancel()
         } catch {
           // Ignore cancellation errors
         }
@@ -219,7 +202,8 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
       const viewport = page.getViewport({ scale: 1 })
       const container = containerRef.current
       const availableWidth = Math.max(100, container.clientWidth - 48)
-      const availableHeight = Math.max(100, container.clientHeight - 48)
+      // Leave room for the top padding and the floating pager pill
+      const availableHeight = Math.max(100, container.clientHeight - 136)
       const ratio = Math.min(availableWidth / viewport.width, availableHeight / viewport.height)
       const clamped = Math.min(3, Math.max(0.25, ratio))
       setScale((prev) => (Math.abs(prev - clamped) < 0.001 ? prev : clamped))
@@ -326,144 +310,32 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
     [numPages, requestPageChange]
   )
 
+  const pillButton = 'inline-flex items-center justify-center h-8 min-w-8 px-1.5 rounded-lg text-[var(--pdfoid-muted)] hover:text-[var(--pdfoid-text)] hover:bg-[var(--pdfoid-hover)] active:scale-[0.96] disabled:opacity-35 disabled:pointer-events-none transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)]'
+  const pillToggle = (active: boolean) => `${pillButton} ${active ? 'bg-[var(--pdfoid-accent-soft)] text-[var(--pdfoid-accent)] hover:bg-[var(--pdfoid-accent-soft)] hover:text-[var(--pdfoid-accent)]' : ''}`
+
   return (
-    <div className="flex flex-col h-full bg-[var(--pdfoid-bg)]" role="region" aria-label="PDF Viewer">
-      {/* Modern Toolbar */}
-      <div className="bg-[var(--pdfoid-surface)] border-b border-[var(--pdfoid-border)] px-6 py-4 shadow-sm" role="toolbar" aria-label="PDF navigation and zoom controls">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Page Navigation */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3" role="group" aria-label="Page navigation">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => requestPageChange(pageNum - 1)}
-                disabled={disablePrev}
-                aria-label="Go to previous page"
-                aria-keyshortcuts="PageUp"
-                className="shrink-0 px-4 py-2 bg-[linear-gradient(135deg,var(--pdfoid-accent2),var(--pdfoid-accent))] text-white rounded-lg hover:opacity-95 active:opacity-90 disabled:bg-[rgba(47,33,22,0.18)] disabled:cursor-not-allowed transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)]"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Previous
-              </button>
-              <button
-                onClick={() => requestPageChange(pageNum + 1)}
-                disabled={disableNext}
-                aria-label="Go to next page"
-                aria-keyshortcuts="PageDown"
-                className="shrink-0 px-4 py-2 bg-[linear-gradient(135deg,var(--pdfoid-accent2),var(--pdfoid-accent))] text-white rounded-lg hover:opacity-95 active:opacity-90 disabled:bg-[rgba(47,33,22,0.18)] disabled:cursor-not-allowed transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)]"
-              >
-                Next
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            <div className="shrink-0 px-4 py-2 bg-[var(--pdfoid-surface-2)] rounded-lg border border-[var(--pdfoid-border)] shadow-sm flex items-center gap-2">
-              <label htmlFor="page-input" className="sr-only">Current page</label>
-              <span className="whitespace-nowrap text-sm font-bold text-[var(--pdfoid-text)]">
-                Page{' '}
-                <input
-                  id="page-input"
-                  type="number"
-                  min={1}
-                  max={numPages || 1}
-                  value={pageNum}
-                  onChange={handlePageInputChange}
-                  className="w-12 text-center bg-[var(--pdfoid-surface)] border border-[var(--pdfoid-border)] rounded px-1 py-0.5 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-[var(--pdfoid-ring)]"
-                  aria-label={`Current page, ${pageNum} of ${numPages}`}
-                />
-                {' '}of {numPages > 0 ? numPages : '...'}
-              </span>
-            </div>
-          </div>
-
-          {/* Zoom Controls */}
-          <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 lg:justify-end" role="group" aria-label="Zoom controls">
-            <button
-              onClick={handleZoomOut}
-              aria-label="Zoom out"
-              aria-keyshortcuts="Control+-"
-              className="shrink-0 px-3 py-2 bg-[var(--pdfoid-surface-2)] hover:bg-[rgba(47,33,22,0.10)] text-[var(--pdfoid-text)] rounded-lg transition-colors text-sm font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)]"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-              </svg>
-            </button>
-            <span
-              className="shrink-0 text-sm font-bold text-[var(--pdfoid-text)] w-16 text-center px-3 py-2 bg-[var(--pdfoid-surface-2)] rounded-lg border border-[var(--pdfoid-border)]"
-              aria-live="polite"
-              aria-label={`Current zoom level: ${Math.round(scale * 100)} percent`}
-            >
-              {Math.round(scale * 100)}%
-            </span>
-            <button
-              onClick={handleZoomIn}
-              aria-label="Zoom in"
-              aria-keyshortcuts="Control+="
-              className="shrink-0 px-3 py-2 bg-[var(--pdfoid-surface-2)] hover:bg-[rgba(47,33,22,0.10)] text-[var(--pdfoid-text)] rounded-lg transition-colors text-sm font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)]"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-            <button
-              onClick={fitToWidth}
-              aria-label="Fit document to width"
-              aria-keyshortcuts="F"
-              aria-pressed={fitMode === 'width'}
-              className={`shrink-0 px-3 py-2 border rounded-lg transition-colors text-sm font-semibold shadow-sm whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)] ${fitMode === 'width' ? 'bg-[var(--pdfoid-accent-soft)] text-[var(--pdfoid-accent2)] border-[var(--pdfoid-border)]' : 'bg-[var(--pdfoid-surface)] border-[var(--pdfoid-border)] hover:bg-[rgba(47,33,22,0.04)] text-[var(--pdfoid-text)]'
-                }`}
-              title="Fit to width (F)"
-            >
-              Fit Width
-            </button>
-            <button
-              onClick={fitToPage}
-              aria-label="Fit entire page in view"
-              aria-pressed={fitMode === 'page'}
-              className={`shrink-0 px-3 py-2 border rounded-lg transition-colors text-sm font-semibold shadow-sm whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)] ${fitMode === 'page' ? 'bg-[var(--pdfoid-accent-soft)] text-[var(--pdfoid-accent2)] border-[var(--pdfoid-border)]' : 'bg-[var(--pdfoid-surface)] border-[var(--pdfoid-border)] hover:bg-[rgba(47,33,22,0.04)] text-[var(--pdfoid-text)]'
-                }`}
-              title="Fit to page"
-            >
-              Fit Page
-            </button>
-            <button
-              onClick={handleZoomReset}
-              aria-label="Reset zoom to 100%"
-              aria-keyshortcuts="Control+0"
-              className="shrink-0 px-3 py-2 bg-[var(--pdfoid-surface)] border border-[var(--pdfoid-border)] hover:bg-[rgba(47,33,22,0.04)] text-[var(--pdfoid-text)] rounded-lg transition-colors text-sm font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pdfoid-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pdfoid-bg)]"
-              title="Actual size (100%)"
-            >
-              100%
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Canvas Container with better visual */}
+    <div className="relative flex flex-col h-full canvas-grain" role="region" aria-label="PDF Viewer">
+      {/* Canvas well */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto flex items-start justify-center px-8 py-10 bg-[var(--pdfoid-bg)]"
+        className="flex-1 overflow-auto scrollbar-thin flex items-start justify-center px-6 pt-8 pb-36 md:pb-24"
         role="document"
         aria-label={`PDF document, page ${pageNum} of ${numPages}`}
         tabIndex={0}
       >
         {error ? (
-          <div className="text-center" role="alert" aria-live="assertive">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <div className="m-auto max-w-xs text-center" role="alert" aria-live="assertive">
+            <div className="w-12 h-12 rounded-xl bg-[var(--pdfoid-danger-soft)] text-[var(--pdfoid-danger)] flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+              <WarningCircle size={24} />
             </div>
-            <p className="font-bold text-red-600 text-lg mb-1">Failed to Load PDF</p>
-            <p className="text-red-500 text-sm">{error}</p>
+            <p className="font-semibold text-[var(--pdfoid-text)] mb-1">This PDF could not be opened</p>
+            <p className="text-sm text-[var(--pdfoid-muted)]">{error}</p>
           </div>
         ) : (
-          <div style={{ position: 'relative', display: 'inline-block' }}>
+          <div style={{ position: 'relative', display: 'inline-block' }} className="animate-fade-in">
             <canvas
               ref={canvasRef}
-              className="shadow-2xl bg-[var(--pdfoid-surface)] border-2 border-[rgba(47,33,22,0.18)] rounded-lg"
+              className="block bg-white rounded-sm shadow-[var(--pdfoid-shadow-page)]"
               aria-label={`PDF page ${pageNum} content`}
               data-testid="pdf-content-canvas"
             />
@@ -477,6 +349,102 @@ export default function PDFViewer({ pdfData, onPageChange, targetPage }: { pdfDa
             )}
           </div>
         )}
+      </div>
+
+      {/* Floating pager + zoom */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 bottom-20 md:bottom-5 z-20 flex items-center gap-1 p-1 rounded-xl bg-[var(--pdfoid-surface)]/95 backdrop-blur-md border border-[var(--pdfoid-border)] shadow-[var(--pdfoid-shadow)] max-w-[calc(100%-32px)] overflow-x-auto scrollbar-none"
+        role="toolbar"
+        aria-label="PDF navigation and zoom controls"
+      >
+        <div className="flex items-center gap-0.5" role="group" aria-label="Page navigation">
+          <button
+            type="button"
+            onClick={() => requestPageChange(pageNum - 1)}
+            disabled={disablePrev}
+            aria-label="Go to previous page"
+            aria-keyshortcuts="PageUp"
+            title="Previous page"
+            className={pillButton}
+          >
+            <CaretLeft size={16} weight="bold" aria-hidden />
+          </button>
+          <div className="flex items-center gap-1.5 px-1 text-sm text-[var(--pdfoid-muted)] whitespace-nowrap tabular-nums">
+            <label htmlFor="page-input" className="sr-only">Current page</label>
+            <input
+              id="page-input"
+              type="number"
+              min={1}
+              max={numPages || 1}
+              value={pageNum}
+              onChange={handlePageInputChange}
+              className="w-10 h-7 text-center rounded-md bg-[var(--pdfoid-surface-2)] text-[var(--pdfoid-text)] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--pdfoid-ring)] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              aria-label={`Current page, ${pageNum} of ${numPages}`}
+            />
+            <span>of {numPages > 0 ? numPages : '…'}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => requestPageChange(pageNum + 1)}
+            disabled={disableNext}
+            aria-label="Go to next page"
+            aria-keyshortcuts="PageDown"
+            title="Next page"
+            className={pillButton}
+          >
+            <CaretRight size={16} weight="bold" aria-hidden />
+          </button>
+        </div>
+
+        <span className="self-stretch w-px my-1.5 mx-1 bg-[var(--pdfoid-border)]" aria-hidden="true" />
+
+        <div className="flex items-center gap-0.5" role="group" aria-label="Zoom controls">
+          <button type="button" onClick={handleZoomOut} aria-label="Zoom out" aria-keyshortcuts="Control+-" title="Zoom out" className={pillButton}>
+            <Minus size={16} weight="bold" aria-hidden />
+          </button>
+          <span
+            className="w-12 text-center text-sm font-medium text-[var(--pdfoid-text)] tabular-nums"
+            aria-live="polite"
+            aria-label={`Current zoom level: ${Math.round(scale * 100)} percent`}
+          >
+            {Math.round(scale * 100)}%
+          </span>
+          <button type="button" onClick={handleZoomIn} aria-label="Zoom in" aria-keyshortcuts="Control+=" title="Zoom in" className={pillButton}>
+            <Plus size={16} weight="bold" aria-hidden />
+          </button>
+          <span className="self-stretch w-px my-1.5 mx-1 bg-[var(--pdfoid-border)]" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={fitToWidth}
+            aria-label="Fit document to width"
+            aria-keyshortcuts="F"
+            aria-pressed={fitMode === 'width'}
+            title="Fit to width (F)"
+            className={pillToggle(fitMode === 'width')}
+          >
+            <ArrowsOutLineHorizontal size={16} aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={fitToPage}
+            aria-label="Fit entire page in view"
+            aria-pressed={fitMode === 'page'}
+            title="Fit page"
+            className={pillToggle(fitMode === 'page')}
+          >
+            <CornersOut size={16} aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={handleZoomReset}
+            aria-label="Reset zoom to 100%"
+            aria-keyshortcuts="Control+0"
+            title="Actual size (Ctrl+0)"
+            className={`${pillButton} text-xs font-semibold px-2`}
+          >
+            1:1
+          </button>
+        </div>
       </div>
     </div>
   )
